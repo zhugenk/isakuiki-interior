@@ -147,7 +147,7 @@
   </div>
   <nav class="tabs">
     <button data-tab="dashboard" class="active">Dashboard</button>
-    <button data-tab="proyek">Proyek</button>
+    <button data-tab="proyek">Proyek (Transaksi &amp; Item)</button>
     <button data-tab="timeline">Timeline Progres</button>
     <button data-tab="kas">Kas Masuk / Keluar</button>
     <button data-tab="pengaturan">Pengaturan</button>
@@ -175,44 +175,67 @@
     <div class="panel">
       <h3>Proyek Perlu Perhatian (belum lunas / masih diproses)</h3>
       <div class="table-wrap"><table>
-        <thead><tr><th>Konsumen</th><th>Produsen</th><th>Barang</th><th>Status</th><th>Keuntungan</th></tr></thead>
+        <thead><tr><th>Konsumen</th><th>Produsen</th><th>Jumlah Item</th><th>Status</th><th>Keuntungan</th></tr></thead>
         <tbody id="d-attn-body"></tbody>
       </table></div>
     </div>
   </section>
 
-  <!-- PROYEK -->
+  <!-- PROYEK (TRANSAKSI + ITEM) -->
   <section id="view-proyek" class="view">
-    <h2 class="section-title">Data Proyek / Pekerjaan</h2>
-    <p class="section-sub">Satu baris = satu penjualan. Keuntungan = Harga Jual − Harga Modal, dihitung otomatis.</p>
+    <h2 class="section-title">Data Proyek (Transaksi &amp; Item Barang)</h2>
+    <p class="section-sub">1 Transaksi bisa berisi beberapa Item Barang. Keuntungan = (Total Jual − Diskon) − Total Modal.</p>
+
     <div class="panel">
-      <h3 id="proyek-form-title">Tambah Proyek Baru</h3>
-      <input type="hidden" id="p-id">
+      <h3 id="trx-form-title">Tambah Transaksi Baru</h3>
+      <input type="hidden" id="trx-id">
       <div class="grid-form">
-        <div class="field"><label>Tanggal Order</label><input type="date" id="p-tanggal"></div>
-        <div class="field"><label>Nama Konsumen</label><input type="text" id="p-konsumen" placeholder="cth. Bu Sari"></div>
-        <div class="field"><label>Nama Produsen / Pembuat</label><input type="text" id="p-produsen" placeholder="cth. CV Kayu Jati"></div>
-        <div class="field"><label>Jenis Barang / Pekerjaan</label><input type="text" id="p-jenis" placeholder="cth. Kursi Tamu Set"></div>
-        <div class="field"><label>Harga Modal (dari Produsen)</label><input type="number" id="p-modal" placeholder="1000000"></div>
-        <div class="field"><label>Harga Jual (ke Konsumen)</label><input type="number" id="p-jual" placeholder="2000000"></div>
+        <div class="field"><label>Tanggal Order</label><input type="date" id="trx-tanggal"></div>
+        <div class="field"><label>Nama Konsumen</label><input type="text" id="trx-konsumen" placeholder="cth. Bu Sari"></div>
+        <div class="field"><label>Nama Produsen / Pembuat</label><input type="text" id="trx-produsen" placeholder="cth. CV Kayu Jati"></div>
         <div class="field"><label>Status Proyek</label>
-          <select id="p-status">
+          <select id="trx-status">
             <option>Menunggu Produksi</option><option>Diproses Produsen</option><option>QC/Selesai Produksi</option>
             <option>Dikirim</option><option>Diterima Konsumen</option><option>Lunas & Selesai</option><option>Batal</option>
           </select>
         </div>
-        <div class="field"><label>Link Foto Hasil Pekerjaan</label><input type="url" id="p-foto" placeholder="https://drive.google.com/..."></div>
+        <div class="field"><label>Diskon Total (Rp, opsional)</label><input type="number" id="trx-diskon" placeholder="0"></div>
+        <div class="field"><label>Link Foto Hasil Pekerjaan</label><input type="url" id="trx-foto" placeholder="https://drive.google.com/..."></div>
       </div>
       <div class="actions-row">
-        <button class="btn primary" id="p-save">Simpan Proyek</button>
-        <button class="btn ghost" id="p-cancel" style="display:none;">Batal Edit</button>
+        <button class="btn primary" id="trx-save">Simpan Transaksi</button>
+        <button class="btn ghost" id="trx-cancel" style="display:none;">Batal Edit</button>
       </div>
     </div>
+
     <div class="panel">
-      <h3>Daftar Proyek</h3>
+      <h3>Daftar Transaksi (Proyek)</h3>
       <div class="table-wrap"><table>
-        <thead><tr><th>Tgl</th><th>Konsumen</th><th>Produsen</th><th>Barang</th><th>Modal</th><th>Jual</th><th>Untung</th><th>Status</th><th>Foto</th><th>Aksi</th></tr></thead>
-        <tbody id="proyek-body"></tbody>
+        <thead><tr><th>Tgl</th><th>Konsumen</th><th>Produsen</th><th>Total Modal</th><th>Total Jual</th><th>Diskon</th><th>Keuntungan</th><th>Status</th><th>Foto</th><th>Aksi</th></tr></thead>
+        <tbody id="trx-body"></tbody>
+      </table></div>
+    </div>
+
+    <div class="panel">
+      <h3 id="item-form-title">Tambah Item Barang</h3>
+      <input type="hidden" id="item-id">
+      <div class="grid-form">
+        <div class="field"><label>Transaksi</label><select id="item-trx"></select></div>
+        <div class="field"><label>Jenis Barang / Pekerjaan</label><input type="text" id="item-jenis" placeholder="cth. Kursi Tamu Set"></div>
+        <div class="field"><label>Harga Modal (dari Produsen)</label><input type="number" id="item-modal" placeholder="1000000"></div>
+        <div class="field"><label>Harga Jual (ke Konsumen)</label><input type="number" id="item-jual" placeholder="2000000"></div>
+      </div>
+      <div class="actions-row">
+        <button class="btn primary" id="item-save">Simpan Item</button>
+        <button class="btn ghost" id="item-cancel" style="display:none;">Batal Edit</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Daftar Item Barang</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Transaksi</th><th>Jenis Barang</th><th>Modal</th><th>Jual</th><th>Aksi</th></tr></thead>
+        <tbody id="item-body"></tbody>
       </table></div>
     </div>
   </section>
@@ -329,12 +352,12 @@ const SESSION_KEY = 'isakuiki_auth';
 
 const LS_URL_KEY = 'isakuiki_api_url';
 let API_URL = localStorage.getItem(LS_URL_KEY) || '';
-let proyekData = [], timelineData = [], kasData = [];
+let transaksiData = [], itemData = [], timelineData = [], kasData = [];
 
 function unlockApp(){
   document.getElementById('lock-screen').classList.add('hidden');
   document.getElementById('app-content').classList.remove('hidden');
-  document.getElementById('p-tanggal').value = new Date().toISOString().slice(0,10);
+  document.getElementById('trx-tanggal').value = new Date().toISOString().slice(0,10);
   document.getElementById('k-tanggal').value = new Date().toISOString().slice(0,10);
   if(API_URL) apiListAll(); else setConnStatus(false, 'Belum terhubung ke Google Sheets');
 }
@@ -364,7 +387,16 @@ function uid(){ return 'id' + Date.now().toString(36) + Math.random().toString(3
 function rupiah(n){ n = Number(n)||0; return 'Rp ' + n.toLocaleString('id-ID'); }
 function fmtDate(d){ if(!d) return '-'; const s = String(d).split('T')[0]; const p = s.split('-'); return p.length===3 ? `${p[2]}/${p[1]}/${p[0]}` : s; }
 function toInputDate(d){ if(!d) return ''; return String(d).split('T')[0]; }
-function projLabel(p){ return `${p.Jenis||'(tanpa nama)'} — ${p.Konsumen||'?'}`; }
+function transLabel(t){ return `${t.Konsumen||'?'} — ${t.Produsen||'?'} (${fmtDate(t.Tanggal)})`; }
+function transaksiTotals(transId){
+  const items = itemData.filter(i=>i.TransaksiID===transId);
+  const totalModal = items.reduce((s,i)=>s+Number(i.Modal||0),0);
+  const totalJual = items.reduce((s,i)=>s+Number(i.Jual||0),0);
+  const t = transaksiData.find(x=>x.ID===transId) || {};
+  const diskon = Number(t.Diskon||0);
+  const keuntungan = (totalJual - diskon) - totalModal;
+  return { items, totalModal, totalJual, diskon, keuntungan };
+}
 
 function setConnStatus(ok, text){
   document.getElementById('conn-dot').classList.toggle('on', ok);
@@ -378,7 +410,8 @@ async function apiListAll(){
     const res = await fetch(`${API_URL}?sheet=all`);
     const json = await res.json();
     if(json.error) throw new Error(json.error);
-    proyekData = json.Proyek || [];
+    transaksiData = json.Transaksi || [];
+    itemData = json.Item || [];
     timelineData = json.Timeline || [];
     kasData = json.Kas || [];
     setConnStatus(true, 'Terhubung ke Google Sheets');
@@ -430,14 +463,17 @@ document.querySelectorAll('nav.tabs button').forEach(btn=>{
 });
 
 function populateProjectSelects(){
-  const opts = proyekData.map(p=>`<option value="${p.ID}">${projLabel(p)}</option>`).join('');
+  const opts = transaksiData.map(t=>`<option value="${t.ID}">${transLabel(t)}</option>`).join('');
+  const itemSel = document.getElementById('item-trx');
   const tSel = document.getElementById('t-proyek');
   const tFilter = document.getElementById('t-proyek-select');
   const kSel = document.getElementById('k-proyek');
-  const curT = tSel.value, curTF = tFilter.value, curK = kSel.value;
+  const curItem = itemSel.value, curT = tSel.value, curTF = tFilter.value, curK = kSel.value;
+  itemSel.innerHTML = '<option value="">-- pilih transaksi --</option>' + opts;
   tSel.innerHTML = '<option value="">-- pilih proyek --</option>' + opts;
   tFilter.innerHTML = '<option value="">-- pilih proyek untuk lihat progres --</option>' + opts;
   kSel.innerHTML = '<option value="">(Umum / Tidak terkait proyek)</option>' + opts;
+  if([...itemSel.options].some(o=>o.value===curItem)) itemSel.value = curItem;
   if([...tSel.options].some(o=>o.value===curT)) tSel.value = curT;
   if([...tFilter.options].some(o=>o.value===curTF)) tFilter.value = curTF;
   if([...kSel.options].some(o=>o.value===curK)) kSel.value = curK;
@@ -445,76 +481,130 @@ function populateProjectSelects(){
 
 function renderAll(){
   populateProjectSelects();
-  renderProyek();
+  renderTransaksi();
+  renderItem();
   renderTimeline();
   renderKas();
   renderDashboard();
 }
 
-// ---------- PROYEK ----------
-function clearProyekForm(){
-  document.getElementById('p-id').value='';
-  ['p-tanggal','p-konsumen','p-produsen','p-jenis','p-modal','p-jual','p-foto'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('p-status').value='Menunggu Produksi';
-  document.getElementById('proyek-form-title').textContent='Tambah Proyek Baru';
-  document.getElementById('p-cancel').style.display='none';
+// ---------- TRANSAKSI ----------
+function clearTrxForm(){
+  document.getElementById('trx-id').value='';
+  ['trx-tanggal','trx-konsumen','trx-produsen','trx-diskon','trx-foto'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('trx-status').value='Menunggu Produksi';
+  document.getElementById('trx-form-title').textContent='Tambah Transaksi Baru';
+  document.getElementById('trx-cancel').style.display='none';
 }
 
-document.getElementById('p-save').addEventListener('click', (e)=>{
+document.getElementById('trx-save').addEventListener('click', (e)=>{
   withBusy(e.target, async ()=>{
-    const id = document.getElementById('p-id').value || uid();
-    const modal = Number(document.getElementById('p-modal').value)||0;
-    const jual = Number(document.getElementById('p-jual').value)||0;
+    const id = document.getElementById('trx-id').value || uid();
     const obj = {
       ID:id,
-      Tanggal: document.getElementById('p-tanggal').value,
-      Konsumen: document.getElementById('p-konsumen').value.trim(),
-      Produsen: document.getElementById('p-produsen').value.trim(),
-      Jenis: document.getElementById('p-jenis').value.trim(),
-      Modal: modal, Jual: jual, Keuntungan: jual-modal,
-      Status: document.getElementById('p-status').value,
-      Foto: document.getElementById('p-foto').value.trim()
+      Tanggal: document.getElementById('trx-tanggal').value,
+      Konsumen: document.getElementById('trx-konsumen').value.trim(),
+      Produsen: document.getElementById('trx-produsen').value.trim(),
+      Status: document.getElementById('trx-status').value,
+      Diskon: Number(document.getElementById('trx-diskon').value)||0,
+      Foto: document.getElementById('trx-foto').value.trim()
     };
-    if(!obj.Konsumen && !obj.Jenis){ alert('Isi minimal Nama Konsumen atau Jenis Barang.'); return; }
-    await apiUpsert('Proyek', obj);
-    clearProyekForm();
+    if(!obj.Konsumen){ alert('Isi minimal Nama Konsumen.'); return; }
+    await apiUpsert('Transaksi', obj);
+    clearTrxForm();
     await apiListAll();
   });
 });
-document.getElementById('p-cancel').addEventListener('click', clearProyekForm);
+document.getElementById('trx-cancel').addEventListener('click', clearTrxForm);
 
-function editProyek(id){
-  const p = proyekData.find(x=>x.ID===id); if(!p) return;
-  document.getElementById('p-id').value=p.ID;
-  document.getElementById('p-tanggal').value=toInputDate(p.Tanggal);
-  document.getElementById('p-konsumen').value=p.Konsumen||'';
-  document.getElementById('p-produsen').value=p.Produsen||'';
-  document.getElementById('p-jenis').value=p.Jenis||'';
-  document.getElementById('p-modal').value=p.Modal||'';
-  document.getElementById('p-jual').value=p.Jual||'';
-  document.getElementById('p-status').value=p.Status||'Menunggu Produksi';
-  document.getElementById('p-foto').value=p.Foto||'';
-  document.getElementById('proyek-form-title').textContent='Edit Proyek';
-  document.getElementById('p-cancel').style.display='inline-block';
+function editTrx(id){
+  const t = transaksiData.find(x=>x.ID===id); if(!t) return;
+  document.getElementById('trx-id').value=t.ID;
+  document.getElementById('trx-tanggal').value=toInputDate(t.Tanggal);
+  document.getElementById('trx-konsumen').value=t.Konsumen||'';
+  document.getElementById('trx-produsen').value=t.Produsen||'';
+  document.getElementById('trx-status').value=t.Status||'Menunggu Produksi';
+  document.getElementById('trx-diskon').value=t.Diskon||'';
+  document.getElementById('trx-foto').value=t.Foto||'';
+  document.getElementById('trx-form-title').textContent='Edit Transaksi';
+  document.getElementById('trx-cancel').style.display='inline-block';
   window.scrollTo({top:0,behavior:'smooth'});
 }
-function deleteProyek(id){
-  if(!confirm('Hapus proyek ini di Google Sheets?')) return;
-  apiDelete('Proyek', id).then(apiListAll).catch(err=>alert('Gagal hapus: '+err.message));
+function deleteTrx(id){
+  if(!confirm('Hapus transaksi ini di Google Sheets? Item barang di dalamnya tidak otomatis terhapus.')) return;
+  apiDelete('Transaksi', id).then(apiListAll).catch(err=>alert('Gagal hapus: '+err.message));
 }
 
-function renderProyek(){
-  const body = document.getElementById('proyek-body');
-  if(proyekData.length===0){ body.innerHTML = `<tr><td colspan="10" class="empty">Belum ada proyek.</td></tr>`; return; }
-  body.innerHTML = proyekData.map(p=>{
-    const untung = Number(p.Jual||0)-Number(p.Modal||0);
+function renderTransaksi(){
+  const body = document.getElementById('trx-body');
+  if(transaksiData.length===0){ body.innerHTML = `<tr><td colspan="10" class="empty">Belum ada transaksi/proyek.</td></tr>`; return; }
+  body.innerHTML = transaksiData.map(t=>{
+    const agg = transaksiTotals(t.ID);
     return `<tr>
-      <td>${fmtDate(p.Tanggal)}</td><td>${p.Konsumen||'-'}</td><td>${p.Produsen||'-'}</td><td>${p.Jenis||'-'}</td>
-      <td>${rupiah(p.Modal)}</td><td>${rupiah(p.Jual)}</td><td class="profit">${rupiah(untung)}</td>
-      <td><span class="badge status">${p.Status||'-'}</span></td>
-      <td>${p.Foto ? `<a class="linkphoto" href="${p.Foto}" target="_blank" rel="noopener">Lihat foto</a>` : '-'}</td>
-      <td><button class="btn ghost small" onclick="editProyek('${p.ID}')">Edit</button>
-          <button class="btn danger small" onclick="deleteProyek('${p.ID}')">Hapus</button></td>
+      <td>${fmtDate(t.Tanggal)}</td><td>${t.Konsumen||'-'}</td><td>${t.Produsen||'-'}</td>
+      <td>${rupiah(agg.totalModal)}</td><td>${rupiah(agg.totalJual)}</td><td>${rupiah(agg.diskon)}</td>
+      <td class="profit">${rupiah(agg.keuntungan)}</td>
+      <td><span class="badge status">${t.Status||'-'}</span></td>
+      <td>${t.Foto ? `<a class="linkphoto" href="${t.Foto}" target="_blank" rel="noopener">Lihat foto</a>` : '-'}</td>
+      <td><button class="btn ghost small" onclick="editTrx('${t.ID}')">Edit</button>
+          <button class="btn danger small" onclick="deleteTrx('${t.ID}')">Hapus</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ---------- ITEM BARANG ----------
+function clearItemForm(){
+  document.getElementById('item-id').value='';
+  ['item-jenis','item-modal','item-jual'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('item-form-title').textContent='Tambah Item Barang';
+  document.getElementById('item-cancel').style.display='none';
+}
+
+document.getElementById('item-save').addEventListener('click', (e)=>{
+  withBusy(e.target, async ()=>{
+    const id = document.getElementById('item-id').value || uid();
+    const trxId = document.getElementById('item-trx').value;
+    if(!trxId){ alert('Pilih transaksi terlebih dahulu (atau buat Transaksi baru dulu di atas).'); return; }
+    const obj = {
+      ID:id, TransaksiID:trxId,
+      Jenis: document.getElementById('item-jenis').value.trim(),
+      Modal: Number(document.getElementById('item-modal').value)||0,
+      Jual: Number(document.getElementById('item-jual').value)||0
+    };
+    if(!obj.Jenis){ alert('Isi Jenis Barang.'); return; }
+    await apiUpsert('Item', obj);
+    clearItemForm();
+    await apiListAll();
+  });
+});
+document.getElementById('item-cancel').addEventListener('click', clearItemForm);
+
+function editItem(id){
+  const i = itemData.find(x=>x.ID===id); if(!i) return;
+  document.getElementById('item-id').value=i.ID;
+  document.getElementById('item-trx').value=i.TransaksiID;
+  document.getElementById('item-jenis').value=i.Jenis||'';
+  document.getElementById('item-modal').value=i.Modal||'';
+  document.getElementById('item-jual').value=i.Jual||'';
+  document.getElementById('item-form-title').textContent='Edit Item Barang';
+  document.getElementById('item-cancel').style.display='inline-block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function deleteItem(id){
+  if(!confirm('Hapus item barang ini di Google Sheets?')) return;
+  apiDelete('Item', id).then(apiListAll).catch(err=>alert('Gagal hapus: '+err.message));
+}
+
+function renderItem(){
+  const body = document.getElementById('item-body');
+  if(itemData.length===0){ body.innerHTML = `<tr><td colspan="5" class="empty">Belum ada item barang.</td></tr>`; return; }
+  body.innerHTML = itemData.map(i=>{
+    const t = transaksiData.find(x=>x.ID===i.TransaksiID);
+    return `<tr>
+      <td>${t?transLabel(t):'(transaksi dihapus)'}</td><td>${i.Jenis||'-'}</td>
+      <td>${rupiah(i.Modal)}</td><td>${rupiah(i.Jual)}</td>
+      <td><button class="btn ghost small" onclick="editItem('${i.ID}')">Edit</button>
+          <button class="btn danger small" onclick="deleteItem('${i.ID}')">Hapus</button></td>
     </tr>`;
   }).join('');
 }
@@ -588,9 +678,9 @@ function renderTimeline(){
   const body = document.getElementById('timeline-body');
   if(timelineData.length===0){ body.innerHTML = `<tr><td colspan="7" class="empty">Belum ada data timeline.</td></tr>`; return; }
   body.innerHTML = timelineData.map(t=>{
-    const p = proyekData.find(x=>x.ID===t.ProjekID);
+    const p = transaksiData.find(x=>x.ID===t.ProjekID);
     return `<tr>
-      <td>${p?projLabel(p):'(proyek dihapus)'}</td><td>${t.Tahap}</td>
+      <td>${p?transLabel(p):'(proyek dihapus)'}</td><td>${t.Tahap}</td>
       <td>${fmtDate(t.Mulai)}</td><td>${fmtDate(t.Selesai)}</td>
       <td><span class="badge status">${t.Status}</span></td><td>${t.Catatan||'-'}</td>
       <td><button class="btn ghost small" onclick="editTimeline('${t.ID}')">Edit</button>
@@ -655,9 +745,9 @@ function renderKas(){
   const rows = sorted.map(k=>{
     const jumlah = Number(k.Jumlah||0);
     saldo += k.Jenis==='Masuk' ? jumlah : -jumlah;
-    const p = proyekData.find(x=>x.ID===k.ProjekID);
+    const p = transaksiData.find(x=>x.ID===k.ProjekID);
     return `<tr>
-      <td>${fmtDate(k.Tanggal)}</td><td>${p?projLabel(p):'-'}</td>
+      <td>${fmtDate(k.Tanggal)}</td><td>${p?transLabel(p):'-'}</td>
       <td><span class="badge ${k.Jenis==='Masuk'?'masuk':'keluar'}">${k.Jenis}</span></td>
       <td>${k.Kategori}</td><td>${k.Keterangan||'-'}</td><td>${rupiah(jumlah)}</td><td>${rupiah(saldo)}</td>
       <td><button class="btn ghost small" onclick="editKas('${k.ID}')">Edit</button>
@@ -671,9 +761,9 @@ function renderKas(){
 function renderDashboard(){
   const masuk = kasData.filter(k=>k.Jenis==='Masuk').reduce((s,k)=>s+Number(k.Jumlah||0),0);
   const keluar = kasData.filter(k=>k.Jenis==='Keluar').reduce((s,k)=>s+Number(k.Jumlah||0),0);
-  const untung = proyekData.reduce((s,p)=>s+(Number(p.Jual||0)-Number(p.Modal||0)),0);
-  const berjalan = proyekData.filter(p=>p.Status!=='Lunas & Selesai' && p.Status!=='Batal').length;
-  const selesai = proyekData.filter(p=>p.Status==='Lunas & Selesai').length;
+  const untung = transaksiData.reduce((s,t)=>s+transaksiTotals(t.ID).keuntungan,0);
+  const berjalan = transaksiData.filter(t=>t.Status!=='Lunas & Selesai' && t.Status!=='Batal').length;
+  const selesai = transaksiData.filter(t=>t.Status==='Lunas & Selesai').length;
 
   document.getElementById('d-masuk').textContent = rupiah(masuk);
   document.getElementById('d-keluar').textContent = rupiah(keluar);
@@ -683,14 +773,17 @@ function renderDashboard(){
   document.getElementById('d-selesai').textContent = selesai;
 
   const attnBody = document.getElementById('d-attn-body');
-  const attn = proyekData.filter(p=>p.Status!=='Lunas & Selesai' && p.Status!=='Batal');
+  const attn = transaksiData.filter(t=>t.Status!=='Lunas & Selesai' && t.Status!=='Batal');
   if(attn.length===0){ attnBody.innerHTML = `<tr><td colspan="5" class="empty">Semua proyek sudah lunas & selesai 🎉</td></tr>`; }
   else{
-    attnBody.innerHTML = attn.map(p=>`<tr>
-      <td>${p.Konsumen||'-'}</td><td>${p.Produsen||'-'}</td><td>${p.Jenis||'-'}</td>
-      <td><span class="badge status">${p.Status}</span></td>
-      <td class="profit">${rupiah(Number(p.Jual||0)-Number(p.Modal||0))}</td>
-    </tr>`).join('');
+    attnBody.innerHTML = attn.map(t=>{
+      const agg = transaksiTotals(t.ID);
+      return `<tr>
+      <td>${t.Konsumen||'-'}</td><td>${t.Produsen||'-'}</td><td>${agg.items.length} item</td>
+      <td><span class="badge status">${t.Status}</span></td>
+      <td class="profit">${rupiah(agg.keuntungan)}</td>
+    </tr>`;
+    }).join('');
   }
 }
 
