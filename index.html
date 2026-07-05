@@ -222,9 +222,11 @@
       <div class="grid-form">
         <div class="field"><label>Transaksi</label><select id="item-trx"></select></div>
         <div class="field"><label>Jenis Barang / Pekerjaan</label><input type="text" id="item-jenis" placeholder="cth. Kursi Tamu Set"></div>
-        <div class="field"><label>Harga Modal (dari Produsen)</label><input type="number" id="item-modal" placeholder="1000000"></div>
-        <div class="field"><label>Harga Jual (ke Konsumen)</label><input type="number" id="item-jual" placeholder="2000000"></div>
+        <div class="field"><label>Qty (Jumlah)</label><input type="number" id="item-qty" placeholder="1" min="0" step="1"></div>
+        <div class="field"><label>Harga Modal per Unit (dari Produsen)</label><input type="number" id="item-modal" placeholder="1000000"></div>
+        <div class="field"><label>Harga Jual Total (ke Konsumen)</label><input type="number" id="item-jual" placeholder="otomatis terhitung, bisa diubah manual"></div>
       </div>
+      <p class="section-sub" style="margin:10px 0 0;">Harga Jual otomatis terisi = Qty × Harga Modal per Unit × 1.1 (margin 10%). Boleh diubah manual sebelum disimpan.</p>
       <div class="actions-row">
         <button class="btn primary" id="item-save">Simpan Item</button>
         <button class="btn ghost" id="item-cancel" style="display:none;">Batal Edit</button>
@@ -234,7 +236,7 @@
     <div class="panel">
       <h3>Daftar Item Barang</h3>
       <div class="table-wrap"><table>
-        <thead><tr><th>Transaksi</th><th>Jenis Barang</th><th>Modal</th><th>Jual</th><th>Aksi</th></tr></thead>
+        <thead><tr><th>Transaksi</th><th>Jenis Barang</th><th>Qty</th><th>Modal/Unit</th><th>Total Modal</th><th>Jual</th><th>Aksi</th></tr></thead>
         <tbody id="item-body"></tbody>
       </table></div>
     </div>
@@ -390,7 +392,7 @@ function toInputDate(d){ if(!d) return ''; return String(d).split('T')[0]; }
 function transLabel(t){ return `${t.Konsumen||'?'} — ${t.Produsen||'?'} (${fmtDate(t.Tanggal)})`; }
 function transaksiTotals(transId){
   const items = itemData.filter(i=>i.TransaksiID===transId);
-  const totalModal = items.reduce((s,i)=>s+Number(i.Modal||0),0);
+  const totalModal = items.reduce((s,i)=>s+(Number(i.Modal||0)*Number(i.Qty||0)),0);
   const totalJual = items.reduce((s,i)=>s+Number(i.Jual||0),0);
   const t = transaksiData.find(x=>x.ID===transId) || {};
   const diskon = Number(t.Diskon||0);
@@ -555,10 +557,20 @@ function renderTransaksi(){
 // ---------- ITEM BARANG ----------
 function clearItemForm(){
   document.getElementById('item-id').value='';
-  ['item-jenis','item-modal','item-jual'].forEach(id=>document.getElementById(id).value='');
+  ['item-jenis','item-qty','item-modal','item-jual'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('item-form-title').textContent='Tambah Item Barang';
   document.getElementById('item-cancel').style.display='none';
 }
+
+function autoHitungJual(){
+  const qty = Number(document.getElementById('item-qty').value);
+  const modal = Number(document.getElementById('item-modal').value);
+  if(qty > 0 && modal > 0){
+    document.getElementById('item-jual').value = Math.round(qty * modal * 1.1);
+  }
+}
+document.getElementById('item-qty').addEventListener('input', autoHitungJual);
+document.getElementById('item-modal').addEventListener('input', autoHitungJual);
 
 document.getElementById('item-save').addEventListener('click', (e)=>{
   withBusy(e.target, async ()=>{
@@ -568,6 +580,7 @@ document.getElementById('item-save').addEventListener('click', (e)=>{
     const obj = {
       ID:id, TransaksiID:trxId,
       Jenis: document.getElementById('item-jenis').value.trim(),
+      Qty: Number(document.getElementById('item-qty').value)||0,
       Modal: Number(document.getElementById('item-modal').value)||0,
       Jual: Number(document.getElementById('item-jual').value)||0
     };
@@ -584,6 +597,7 @@ function editItem(id){
   document.getElementById('item-id').value=i.ID;
   document.getElementById('item-trx').value=i.TransaksiID;
   document.getElementById('item-jenis').value=i.Jenis||'';
+  document.getElementById('item-qty').value=i.Qty||'';
   document.getElementById('item-modal').value=i.Modal||'';
   document.getElementById('item-jual').value=i.Jual||'';
   document.getElementById('item-form-title').textContent='Edit Item Barang';
@@ -597,12 +611,14 @@ function deleteItem(id){
 
 function renderItem(){
   const body = document.getElementById('item-body');
-  if(itemData.length===0){ body.innerHTML = `<tr><td colspan="5" class="empty">Belum ada item barang.</td></tr>`; return; }
+  if(itemData.length===0){ body.innerHTML = `<tr><td colspan="7" class="empty">Belum ada item barang.</td></tr>`; return; }
   body.innerHTML = itemData.map(i=>{
     const t = transaksiData.find(x=>x.ID===i.TransaksiID);
+    const qty = Number(i.Qty||0);
+    const modalUnit = Number(i.Modal||0);
     return `<tr>
       <td>${t?transLabel(t):'(transaksi dihapus)'}</td><td>${i.Jenis||'-'}</td>
-      <td>${rupiah(i.Modal)}</td><td>${rupiah(i.Jual)}</td>
+      <td>${qty}</td><td>${rupiah(modalUnit)}</td><td>${rupiah(qty*modalUnit)}</td><td>${rupiah(i.Jual)}</td>
       <td><button class="btn ghost small" onclick="editItem('${i.ID}')">Edit</button>
           <button class="btn danger small" onclick="deleteItem('${i.ID}')">Hapus</button></td>
     </tr>`;
