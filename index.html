@@ -219,7 +219,7 @@
     <div class="panel">
       <h3>Daftar Transaksi (Proyek)</h3>
       <div class="table-wrap"><table>
-        <thead><tr><th>Tgl</th><th>Konsumen</th><th>Produsen</th><th>Total Modal</th><th>Total Jual</th><th>Diskon</th><th>Keuntungan</th><th>Status</th><th>Foto</th><th>Aksi</th></tr></thead>
+        <thead><tr><th>Tgl</th><th>Konsumen</th><th>Produsen</th><th>Total Modal</th><th>Total Jual</th><th>Diskon</th><th>Keuntungan</th><th>Sisa Tagihan Konsumen</th><th>Sisa Utang Produsen</th><th>Status</th><th>Foto</th><th>Aksi</th></tr></thead>
         <tbody id="trx-body"></tbody>
       </table></div>
     </div>
@@ -306,7 +306,8 @@
         <div class="field"><label>Jenis</label><select id="k-jenis"><option>Masuk</option><option>Keluar</option></select></div>
         <div class="field"><label>Kategori</label>
           <select id="k-kategori">
-            <option>DP Konsumen</option><option>Pelunasan Konsumen</option><option>Bayar ke Produsen</option>
+            <option>DP Konsumen</option><option>Cicilan/Termin Konsumen</option><option>Pelunasan Konsumen</option>
+            <option>DP ke Produsen</option><option>Pelunasan ke Produsen</option>
             <option>Ongkos Kirim</option><option>Biaya Operasional</option><option>Lainnya</option>
           </select>
         </div>
@@ -336,7 +337,7 @@
       <div class="grid-form">
         <div class="field" style="grid-column:1/-1;">
           <label>Web App URL</label>
-          <input type="url" id="api-url" placeholder="https://script.google.com/macros/s/AKfycbz9bsMrO1JyFR_4B87ADqz4imQ9LILo-D7KcbreqpZduFPIWnY3JY6oiq3jTa-jBi-A/exec">
+          <input type="url" id="api-url" placeholder="https://script.google.com/macros/s/xxxxxxx/exec">
         </div>
       </div>
       <div class="actions-row">
@@ -418,6 +419,26 @@ function transaksiTotals(transId){
   const diskon = Number(t.Diskon||0);
   const keuntungan = (totalJual - diskon) - totalModal;
   return { items, totalModal, totalJual, diskon, keuntungan };
+}
+
+const KATEGORI_MASUK_KONSUMEN = ['DP Konsumen','Cicilan/Termin Konsumen','Pelunasan Konsumen'];
+const KATEGORI_KELUAR_PRODUSEN = ['DP ke Produsen','Pelunasan ke Produsen'];
+
+function trxFinance(transId){
+  const agg = transaksiTotals(transId);
+  const tagihanKonsumen = agg.totalJual - agg.diskon;
+  const dibayarKonsumen = kasData
+    .filter(k=>k.ProjekID===transId && k.Jenis==='Masuk' && KATEGORI_MASUK_KONSUMEN.includes(k.Kategori))
+    .reduce((s,k)=>s+Number(k.Jumlah||0),0);
+  const sisaTagihanKonsumen = tagihanKonsumen - dibayarKonsumen;
+
+  const utangProdusen = agg.totalModal;
+  const dibayarProdusen = kasData
+    .filter(k=>k.ProjekID===transId && k.Jenis==='Keluar' && KATEGORI_KELUAR_PRODUSEN.includes(k.Kategori))
+    .reduce((s,k)=>s+Number(k.Jumlah||0),0);
+  const sisaUtangProdusen = utangProdusen - dibayarProdusen;
+
+  return { ...agg, tagihanKonsumen, dibayarKonsumen, sisaTagihanKonsumen, utangProdusen, dibayarProdusen, sisaUtangProdusen };
 }
 
 function setConnStatus(ok, text){
@@ -559,13 +580,17 @@ function deleteTrx(id){
 
 function renderTransaksi(){
   const body = document.getElementById('trx-body');
-  if(transaksiData.length===0){ body.innerHTML = `<tr><td colspan="10" class="empty">Belum ada transaksi/proyek.</td></tr>`; return; }
+  if(transaksiData.length===0){ body.innerHTML = `<tr><td colspan="12" class="empty">Belum ada transaksi/proyek.</td></tr>`; return; }
   body.innerHTML = transaksiData.map(t=>{
-    const agg = transaksiTotals(t.ID);
+    const f = trxFinance(t.ID);
+    const sisaKonsumenClass = f.sisaTagihanKonsumen > 0 ? 'keluar' : 'masuk';
+    const sisaProdusenClass = f.sisaUtangProdusen > 0 ? 'keluar' : 'masuk';
     return `<tr>
       <td>${fmtDate(t.Tanggal)}</td><td>${t.Konsumen||'-'}</td><td>${t.Produsen||'-'}</td>
-      <td>${rupiah(agg.totalModal)}</td><td>${rupiah(agg.totalJual)}</td><td>${rupiah(agg.diskon)}</td>
-      <td class="profit">${rupiah(agg.keuntungan)}</td>
+      <td>${rupiah(f.totalModal)}</td><td>${rupiah(f.totalJual)}</td><td>${rupiah(f.diskon)}</td>
+      <td class="profit">${rupiah(f.keuntungan)}</td>
+      <td><span class="badge ${sisaKonsumenClass}">${rupiah(f.sisaTagihanKonsumen)}</span></td>
+      <td><span class="badge ${sisaProdusenClass}">${rupiah(f.sisaUtangProdusen)}</span></td>
       <td><span class="badge status">${t.Status||'-'}</span></td>
       <td>${t.Foto ? `<a class="linkphoto" href="${t.Foto}" target="_blank" rel="noopener">Lihat foto</a>` : '-'}</td>
       <td><button class="btn ghost small" onclick="editTrx('${t.ID}')">Edit</button>
