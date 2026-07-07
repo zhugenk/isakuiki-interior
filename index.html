@@ -224,6 +224,14 @@
       </table></div>
     </div>
 
+    <div class="panel" id="trx-detail-panel" style="display:none;">
+      <h3>Rincian Transaksi: <span id="detail-title"></span></h3>
+      <div id="detail-content"></div>
+      <div class="actions-row">
+        <button class="btn ghost" id="detail-close">Tutup Rincian</button>
+      </div>
+    </div>
+
     <div class="panel">
       <h3 id="item-form-title">Tambah Item Barang</h3>
       <input type="hidden" id="item-id">
@@ -321,6 +329,15 @@
     </div>
     <div class="panel">
       <h3>Riwayat Transaksi (Saldo Berjalan)</h3>
+      <div class="toolbar">
+        <div class="field"><label>Filter Tampilan</label>
+          <select id="kas-filter">
+            <option value="semua">Semua</option>
+            <option value="konsumen">Hanya Pembayaran dari Konsumen</option>
+            <option value="produsen">Hanya Pembayaran ke Produsen</option>
+          </select>
+        </div>
+      </div>
       <div class="table-wrap"><table>
         <thead><tr><th>Tgl</th><th>Proyek</th><th>Jenis</th><th>Kategori</th><th>Keterangan</th><th>Jumlah</th><th>Saldo</th><th>Aksi</th></tr></thead>
         <tbody id="kas-body"></tbody>
@@ -593,11 +610,74 @@ function renderTransaksi(){
       <td><span class="badge ${sisaProdusenClass}">${rupiah(f.sisaUtangProdusen)}</span></td>
       <td><span class="badge status">${t.Status||'-'}</span></td>
       <td>${t.Foto ? `<a class="linkphoto" href="${t.Foto}" target="_blank" rel="noopener">Lihat foto</a>` : '-'}</td>
-      <td><button class="btn ghost small" onclick="editTrx('${t.ID}')">Edit</button>
+      <td><button class="btn ghost small" onclick="showTrxDetail('${t.ID}')">Rincian</button>
+          <button class="btn ghost small" onclick="editTrx('${t.ID}')">Edit</button>
           <button class="btn danger small" onclick="deleteTrx('${t.ID}')">Hapus</button></td>
     </tr>`;
   }).join('');
 }
+
+function showTrxDetail(id){
+  const t = transaksiData.find(x=>x.ID===id); if(!t) return;
+  const f = trxFinance(id);
+
+  const itemRows = f.items.map(i=>{
+    const qty = Number(i.Qty||0), modal = Number(i.Modal||0);
+    return `<tr><td>${i.Jenis||'-'}</td><td>${qty}</td><td>${rupiah(modal)}</td><td>${rupiah(qty*modal)}</td><td>${rupiah(i.Jual)}</td></tr>`;
+  }).join('') || `<tr><td colspan="5" class="empty">Belum ada item.</td></tr>`;
+
+  const bayarKonsumen = kasData.filter(k=>k.ProjekID===id && k.Jenis==='Masuk' && KATEGORI_MASUK_KONSUMEN.includes(k.Kategori))
+    .sort((a,b)=>String(a.Tanggal||'').localeCompare(String(b.Tanggal||'')));
+  const bayarProdusen = kasData.filter(k=>k.ProjekID===id && k.Jenis==='Keluar' && KATEGORI_KELUAR_PRODUSEN.includes(k.Kategori))
+    .sort((a,b)=>String(a.Tanggal||'').localeCompare(String(b.Tanggal||'')));
+
+  const rowsKonsumen = bayarKonsumen.map(k=>`<tr><td>${fmtDate(k.Tanggal)}</td><td>${k.Kategori}</td><td>${k.Keterangan||'-'}</td><td>${rupiah(k.Jumlah)}</td></tr>`).join('')
+    || `<tr><td colspan="4" class="empty">Belum ada pembayaran dari konsumen.</td></tr>`;
+  const rowsProdusen = bayarProdusen.map(k=>`<tr><td>${fmtDate(k.Tanggal)}</td><td>${k.Kategori}</td><td>${k.Keterangan||'-'}</td><td>${rupiah(k.Jumlah)}</td></tr>`).join('')
+    || `<tr><td colspan="4" class="empty">Belum ada pembayaran ke produsen.</td></tr>`;
+
+  document.getElementById('detail-title').textContent = `${t.Konsumen||'-'} — ${t.Produsen||'-'} (${fmtDate(t.Tanggal)})`;
+  document.getElementById('detail-content').innerHTML = `
+    <h4 style="font-family:'Fraunces',serif;color:var(--wood-dark);margin:16px 0 8px;">Rincian Item Barang</h4>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Jenis Barang</th><th>Qty</th><th>Modal/Unit</th><th>Total Modal</th><th>Jual</th></tr></thead>
+      <tbody>${itemRows}</tbody>
+    </table></div>
+
+    <div class="cards" style="margin-top:16px;">
+      <div class="card"><div class="label">Total Modal</div><div class="value">${rupiah(f.totalModal)}</div></div>
+      <div class="card"><div class="label">Total Jual</div><div class="value">${rupiah(f.totalJual)}</div></div>
+      <div class="card keluar"><div class="label">Diskon</div><div class="value">${rupiah(f.diskon)}</div></div>
+      <div class="card masuk"><div class="label">Harga Jual Final</div><div class="value">${rupiah(f.tagihanKonsumen)}</div></div>
+      <div class="card brass"><div class="label">Keuntungan</div><div class="value">${rupiah(f.keuntungan)}</div></div>
+    </div>
+
+    <h4 style="font-family:'Fraunces',serif;color:var(--wood-dark);margin:20px 0 8px;">Pembayaran dari Konsumen</h4>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Tgl</th><th>Kategori</th><th>Keterangan</th><th>Jumlah</th></tr></thead>
+      <tbody>${rowsKonsumen}</tbody>
+    </table></div>
+    <p class="section-sub" style="margin-top:8px;">
+      Total dibayar: <b>${rupiah(f.dibayarKonsumen)}</b> dari tagihan <b>${rupiah(f.tagihanKonsumen)}</b> —
+      Sisa: <b style="color:${f.sisaTagihanKonsumen>0?'var(--keluar)':'var(--masuk)'}">${rupiah(f.sisaTagihanKonsumen)}</b>
+    </p>
+
+    <h4 style="font-family:'Fraunces',serif;color:var(--wood-dark);margin:20px 0 8px;">Pembayaran ke Produsen</h4>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Tgl</th><th>Kategori</th><th>Keterangan</th><th>Jumlah</th></tr></thead>
+      <tbody>${rowsProdusen}</tbody>
+    </table></div>
+    <p class="section-sub" style="margin-top:8px;">
+      Total dibayar: <b>${rupiah(f.dibayarProdusen)}</b> dari kewajiban <b>${rupiah(f.utangProdusen)}</b> —
+      Sisa: <b style="color:${f.sisaUtangProdusen>0?'var(--keluar)':'var(--masuk)'}">${rupiah(f.sisaUtangProdusen)}</b>
+    </p>
+  `;
+  document.getElementById('trx-detail-panel').style.display = 'block';
+  document.getElementById('trx-detail-panel').scrollIntoView({behavior:'smooth', block:'start'});
+}
+document.getElementById('detail-close').addEventListener('click', ()=>{
+  document.getElementById('trx-detail-panel').style.display = 'none';
+});
 
 // ---------- ITEM BARANG ----------
 function clearItemForm(){
@@ -800,8 +880,15 @@ function deleteKas(id){
 
 function renderKas(){
   const body = document.getElementById('kas-body');
-  if(kasData.length===0){ body.innerHTML = `<tr><td colspan="8" class="empty">Belum ada transaksi kas.</td></tr>`; return; }
-  const sorted = [...kasData].sort((a,b)=> String(a.Tanggal||'').localeCompare(String(b.Tanggal||'')));
+  const filterVal = document.getElementById('kas-filter').value;
+  let filtered = kasData;
+  if(filterVal === 'konsumen'){
+    filtered = kasData.filter(k=>k.Jenis==='Masuk' && KATEGORI_MASUK_KONSUMEN.includes(k.Kategori));
+  } else if(filterVal === 'produsen'){
+    filtered = kasData.filter(k=>k.Jenis==='Keluar' && KATEGORI_KELUAR_PRODUSEN.includes(k.Kategori));
+  }
+  if(filtered.length===0){ body.innerHTML = `<tr><td colspan="8" class="empty">Tidak ada data untuk filter ini.</td></tr>`; return; }
+  const sorted = [...filtered].sort((a,b)=> String(a.Tanggal||'').localeCompare(String(b.Tanggal||'')));
   let saldo = 0;
   const rows = sorted.map(k=>{
     const jumlah = Number(k.Jumlah||0);
@@ -817,6 +904,7 @@ function renderKas(){
   });
   body.innerHTML = rows.reverse().join('');
 }
+document.getElementById('kas-filter').addEventListener('change', renderKas);
 
 // ---------- DASHBOARD ----------
 function renderDashboard(){
