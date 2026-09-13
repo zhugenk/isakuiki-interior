@@ -23,11 +23,11 @@
     --line:#E4DBC9;
     --shadow: 0 2px 10px rgba(62,43,35,0.08);
     --sidebar-w: 260px;
+    --topbar-h: 64px;
   }
   *{box-sizing:border-box;}
   body{margin:0;background:var(--cream);color:var(--ink);font-family:'Source Sans 3', sans-serif;-webkit-font-smoothing:antialiased;}
 
-  /* ================== LAYOUT ================== */
   .app-layout{display:flex;min-height:100vh;}
 
   /* ================== SIDEBAR ================== */
@@ -76,11 +76,12 @@
   .main-area{margin-left:var(--sidebar-w);flex:1;min-width:0;display:flex;flex-direction:column;}
   .topbar{
     background:var(--paper);border-bottom:1px solid var(--line);
-    padding:14px 28px;position:sticky;top:0;z-index:15;
+    height:var(--topbar-h);padding:0 28px;
+    position:sticky;top:0;z-index:30;
     display:flex;align-items:center;justify-content:space-between;gap:14px;
     box-shadow:0 1px 4px rgba(62,43,35,0.04);
   }
-  .topbar .page-title{font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:var(--wood-dark);margin:0;}
+  .topbar .page-title{font-family:'Fraunces',serif;font-size:19px;font-weight:600;color:var(--wood-dark);margin:0;line-height:1.15;}
   .topbar .page-sub{font-size:12.5px;color:var(--ink-soft);margin-top:2px;}
   .menu-toggle{display:none;background:var(--wood-dark);color:var(--cream);border:none;padding:9px 12px;border-radius:9px;cursor:pointer;font-size:16px;line-height:1;}
   .sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:25;}
@@ -119,17 +120,56 @@
   button.btn.small{padding:6px 12px;font-size:12.5px;}
   button.btn.danger{background:var(--keluar-bg);color:var(--keluar);}
   button.btn.danger:hover{background:#eccfc9;}
+
+  /* ================== TABEL ================== */
   table{width:100%;border-collapse:collapse;font-size:13.5px;}
   th{text-align:left;background:var(--wood-dark);color:var(--cream);padding:10px 10px;font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.3px;}
   th:first-child{border-radius:8px 0 0 0;}
   th:last-child{border-radius:0 8px 0 0;}
   td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top;}
   tr:hover td{background:#FBF8F1;}
+
+  /* Table wrap dengan scroll internal + header sticky */
+  .table-wrap{
+    overflow:auto;
+    border-radius:8px;
+    max-height:min(70vh, 520px);
+    position:relative;
+  }
+  .table-wrap table{
+    border-collapse:separate;
+    border-spacing:0;
+  }
+  .table-wrap thead th{
+    position:sticky;
+    top:0;
+    z-index:2;
+    box-shadow:0 1px 0 rgba(0,0,0,0.08);
+  }
+  .table-wrap tbody tr td{background:var(--paper);}
+  .table-wrap tbody tr:hover td{background:#FBF8F1;}
+
+  /* ================== PAGINATION ================== */
+  .pagination{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    margin-top:14px;padding-top:12px;border-top:1px solid var(--line);
+    flex-wrap:wrap;font-size:12.5px;color:var(--ink-soft);
+  }
+  .page-btns{display:flex;gap:4px;flex-wrap:wrap;align-items:center;}
+  .page-btn{
+    background:var(--paper);border:1px solid var(--line);border-radius:6px;
+    padding:5px 10px;font-family:inherit;font-size:12.5px;font-weight:600;
+    cursor:pointer;color:var(--wood-dark);min-width:32px;transition:.15s;
+  }
+  .page-btn:hover:not(:disabled):not(.active){background:var(--brass-light);border-color:var(--brass);}
+  .page-btn.active{background:var(--wood-dark);color:var(--cream);border-color:var(--wood-dark);}
+  .page-btn:disabled{opacity:.4;cursor:not-allowed;}
+  .page-dots{padding:5px 4px;color:var(--ink-soft);font-weight:700;}
+
   .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:700;}
   .badge.masuk{background:var(--masuk-bg);color:var(--masuk);}
   .badge.keluar{background:var(--keluar-bg);color:var(--keluar);}
   .badge.status{background:var(--brass-light);color:#7A5D18;}
-  .table-wrap{overflow-x:auto;border-radius:8px;}
   .profit{color:var(--masuk);font-weight:700;}
   .empty{padding:30px;text-align:center;color:var(--ink-soft);font-style:italic;}
   .timeline-track{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
@@ -142,7 +182,7 @@
   ::placeholder{color:#B7AC98;}
   code.inline{background:var(--brass-light);padding:2px 6px;border-radius:5px;font-size:12.5px;}
 
-  /* ================== MENU LANDING (daftar teks) ================== */
+  /* ================== MENU LANDING ================== */
   .menu-landing{padding:4px 0;}
   .menu-cards{display:flex;flex-direction:column;gap:10px;max-width:560px;}
   .menu-card{
@@ -156,49 +196,41 @@
   .menu-card:hover{background:var(--brass-light);border-color:var(--brass);transform:translateX(3px);}
   .menu-card .mc-icon{
     width:38px;height:38px;border-radius:10px;background:var(--brass-light);
-    display:flex;align-items:center;justify-content:center;flex-shrink:0;
-    font-size:18px;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;
   }
   .menu-card .mc-text{display:flex;flex-direction:column;gap:2px;flex:1;}
   .menu-card .mc-title{font-weight:700;color:var(--wood-dark);font-size:15px;}
   .menu-card .mc-sub{font-size:12.5px;color:var(--ink-soft);font-weight:500;}
   .menu-card .arrow{margin-left:auto;color:var(--brass);font-weight:700;font-size:18px;flex-shrink:0;}
 
-  /* ================== BACK BUTTON ================== */
+  /* ================== PAGE HEAD STICKY (di dalam sub-menu) ================== */
+  .menu-page .page-head{
+    position:sticky;
+    top:var(--topbar-h);
+    z-index:20;
+    background:var(--cream);
+    padding:6px 0 14px;
+    margin-bottom:0;
+  }
   .back-btn{
     display:inline-flex;align-items:center;gap:6px;
     background:transparent;border:none;
-    color:var(--wood-dark);font-weight:600;font-size:14px;
-    padding:7px 12px;margin-bottom:14px;border-radius:7px;
+    color:var(--wood-dark);font-weight:600;font-size:13.5px;
+    padding:6px 11px;margin-bottom:8px;border-radius:7px;
     cursor:pointer;font-family:inherit;transition:.15s;
   }
   .back-btn:hover{background:var(--brass-light);}
   .back-btn::before{content:"←";font-weight:700;color:var(--brass);}
+  .menu-page .page-head .section-title{margin-bottom:2px;font-size:19px;}
+  .menu-page .page-head .section-sub{margin:0;font-size:13px;}
 
-  /* ================== WORK AREA (form sticky + tabel) ================== */
-  .work-area{
-    display:grid;
-    grid-template-columns:400px minmax(0,1fr);
-    gap:20px;
-    align-items:start;
-    margin-bottom:20px;
-  }
-  .work-side{position:sticky;top:86px;}
-  .work-side,.work-main{min-width:0;}
-  .work-main{display:flex;flex-direction:column;gap:20px;}
-  .work-area .panel{margin-bottom:0;}
-
-  /* dua form sejajar */
+  /* ================== WORK AREA (2 kolom) ================== */
   .form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;}
   .form-grid-2 .panel{margin-bottom:0;}
 
   @media (max-width: 1100px){
-    .work-area{grid-template-columns:1fr;}
-    .work-side{position:static;}
     .form-grid-2{grid-template-columns:1fr;}
   }
-
-  .menu-page[hidden]{display:none;}
 
   /* ================== LOCK SCREEN ================== */
   #lock-screen{
@@ -224,9 +256,10 @@
     .main-area{margin-left:0;}
     .menu-toggle{display:inline-block;}
     .sidebar-backdrop.show{display:block;}
-    .topbar{padding:14px 18px;}
+    .topbar{padding:0 18px;}
     main{padding:18px;}
     .topbar .page-title{font-size:17px;}
+    .table-wrap{max-height:60vh;}
   }
 </style>
 </head>
@@ -308,7 +341,7 @@
           Aplikasi belum tersambung ke Google Sheets. Buka menu <b>Pengaturan</b> untuk memasukkan URL API terlebih dahulu.
         </div>
 
-        <!-- ==================== DASHBOARD (langsung) ==================== -->
+        <!-- ==================== DASHBOARD ==================== -->
         <section id="view-dashboard" class="view active">
           <h2 class="section-title">Ringkasan Usaha</h2>
           <p class="section-sub">Data langsung dari Google Sheets.</p>
@@ -332,7 +365,6 @@
         <!-- ==================== PROYEK ==================== -->
         <section id="view-proyek" class="view">
 
-          <!-- Landing: daftar teks -->
           <div class="menu-landing" id="landing-proyek">
             <h2 class="section-title">Menu Proyek &amp; Item</h2>
             <p class="section-sub">Pilih menu di bawah ini:</p>
@@ -364,12 +396,13 @@
             </div>
           </div>
 
-          <!-- Halaman: Input Data Proyek (2 form) -->
+          <!-- Input Data Proyek -->
           <div class="menu-page" id="page-proyek-input" hidden>
-            <button class="back-btn" data-back>Kembali ke Menu</button>
-            <h2 class="section-title">Input Data Proyek</h2>
-            <p class="section-sub">Isi form Transaksi lalu tambahkan Item barangnya.</p>
-
+            <div class="page-head">
+              <button class="back-btn" data-back>Kembali ke Menu</button>
+              <h2 class="section-title">Input Data Proyek</h2>
+              <p class="section-sub">Isi form Transaksi lalu tambahkan Item barangnya.</p>
+            </div>
             <div class="form-grid-2">
               <div class="panel">
                 <h3 id="trx-form-title">Tambah Transaksi Baru</h3>
@@ -412,29 +445,35 @@
             </div>
           </div>
 
-          <!-- Halaman: Daftar Transaksi -->
+          <!-- Daftar Transaksi -->
           <div class="menu-page" id="page-proyek-dtrx" hidden>
-            <button class="back-btn" data-back>Kembali ke Menu</button>
-            <h2 class="section-title">Daftar Transaksi (Proyek)</h2>
-            <p class="section-sub">Semua transaksi yang tercatat beserta keuntungannya.</p>
-            <div class="panel">
+            <div class="page-head">
+              <button class="back-btn" data-back>Kembali ke Menu</button>
+              <h2 class="section-title">Daftar Transaksi (Proyek)</h2>
+              <p class="section-sub">Semua transaksi yang tercatat beserta keuntungannya.</p>
+            </div>
+            <div class="panel" style="margin-bottom:0;">
               <div class="table-wrap"><table>
                 <thead><tr><th>Tgl</th><th>Konsumen</th><th>Produsen</th><th>Modal</th><th>Jual</th><th>Diskon</th><th>Untung</th><th>Status</th><th>Foto</th><th>Aksi</th></tr></thead>
                 <tbody id="trx-body"></tbody>
               </table></div>
+              <div id="trx-pagination"></div>
             </div>
           </div>
 
-          <!-- Halaman: Daftar Item -->
+          <!-- Daftar Item -->
           <div class="menu-page" id="page-proyek-ditem" hidden>
-            <button class="back-btn" data-back>Kembali ke Menu</button>
-            <h2 class="section-title">Daftar Item Barang</h2>
-            <p class="section-sub">Semua item dari setiap transaksi.</p>
-            <div class="panel">
+            <div class="page-head">
+              <button class="back-btn" data-back>Kembali ke Menu</button>
+              <h2 class="section-title">Daftar Item Barang</h2>
+              <p class="section-sub">Semua item dari setiap transaksi.</p>
+            </div>
+            <div class="panel" style="margin-bottom:0;">
               <div class="table-wrap"><table>
                 <thead><tr><th>Transaksi</th><th>Jenis Barang</th><th>Qty</th><th>Modal/Unit</th><th>Total Modal</th><th>Jual</th><th>Aksi</th></tr></thead>
                 <tbody id="item-body"></tbody>
               </table></div>
+              <div id="item-pagination"></div>
             </div>
           </div>
         </section>
@@ -466,10 +505,12 @@
           </div>
 
           <div class="menu-page" id="page-timeline-form" hidden>
-            <button class="back-btn" data-back>Kembali ke Menu</button>
-            <h2 class="section-title">Tambah / Update Tahap</h2>
-            <p class="section-sub">Catat tahap produksi untuk setiap proyek.</p>
-            <div class="panel" style="max-width:640px;">
+            <div class="page-head">
+              <button class="back-btn" data-back>Kembali ke Menu</button>
+              <h2 class="section-title">Tambah / Update Tahap</h2>
+              <p class="section-sub">Catat tahap produksi untuk setiap proyek.</p>
+            </div>
+            <div class="panel" style="max-width:640px;margin-bottom:0;">
               <input type="hidden" id="t-id">
               <div class="grid-form">
                 <div class="field" style="grid-column:1/-1;"><label>Proyek</label><select id="t-proyek"></select></div>
@@ -494,9 +535,11 @@
           </div>
 
           <div class="menu-page" id="page-timeline-view" hidden>
-            <button class="back-btn" data-back>Kembali ke Menu</button>
-            <h2 class="section-title">Progres Proyek &amp; Riwayat Tahap</h2>
-            <p class="section-sub">Pantau tahap barang dari produsen sampai diterima konsumen.</p>
+            <div class="page-head">
+              <button class="back-btn" data-back>Kembali ke Menu</button>
+              <h2 class="section-title">Progres Proyek &amp; Riwayat Tahap</h2>
+              <p class="section-sub">Pantau tahap barang dari produsen sampai diterima konsumen.</p>
+            </div>
             <div class="panel">
               <div class="field" style="margin-bottom:10px;max-width:420px;">
                 <label>Pilih Proyek</label>
@@ -505,12 +548,13 @@
               <p class="section-sub" id="t-track-empty" style="margin:0;">Pilih proyek di atas untuk melihat progres.</p>
               <div class="timeline-track" id="t-track"></div>
             </div>
-            <div class="panel">
+            <div class="panel" style="margin-bottom:0;">
               <h3>Semua Riwayat Tahap</h3>
               <div class="table-wrap"><table>
                 <thead><tr><th>Proyek</th><th>Tahap</th><th>Mulai</th><th>Selesai</th><th>Status</th><th>Catatan</th><th>Aksi</th></tr></thead>
                 <tbody id="timeline-body"></tbody>
               </table></div>
+              <div id="timeline-pagination"></div>
             </div>
           </div>
         </section>
@@ -542,10 +586,12 @@
           </div>
 
           <div class="menu-page" id="page-kas-form" hidden>
-            <button class="back-btn" data-back>Kembali ke Menu</button>
-            <h2 class="section-title">Tambah Transaksi Kas</h2>
-            <p class="section-sub">Catat setiap uang masuk atau keluar.</p>
-            <div class="panel" style="max-width:640px;">
+            <div class="page-head">
+              <button class="back-btn" data-back>Kembali ke Menu</button>
+              <h2 class="section-title">Tambah Transaksi Kas</h2>
+              <p class="section-sub">Catat setiap uang masuk atau keluar.</p>
+            </div>
+            <div class="panel" style="max-width:640px;margin-bottom:0;">
               <input type="hidden" id="k-id">
               <div class="grid-form">
                 <div class="field"><label>Tanggal</label><input type="date" id="k-tanggal"></div>
@@ -568,19 +614,22 @@
           </div>
 
           <div class="menu-page" id="page-kas-list" hidden>
-            <button class="back-btn" data-back>Kembali ke Menu</button>
-            <h2 class="section-title">Riwayat Transaksi (Saldo Berjalan)</h2>
-            <p class="section-sub">Semua transaksi kas yang tercatat, urut sesuai tanggal.</p>
-            <div class="panel">
+            <div class="page-head">
+              <button class="back-btn" data-back>Kembali ke Menu</button>
+              <h2 class="section-title">Riwayat Transaksi (Saldo Berjalan)</h2>
+              <p class="section-sub">Semua transaksi kas yang tercatat, urut sesuai tanggal.</p>
+            </div>
+            <div class="panel" style="margin-bottom:0;">
               <div class="table-wrap"><table>
                 <thead><tr><th>Tgl</th><th>Proyek</th><th>Jenis</th><th>Kategori</th><th>Keterangan</th><th>Jumlah</th><th>Saldo</th><th>Aksi</th></tr></thead>
                 <tbody id="kas-body"></tbody>
               </table></div>
+              <div id="kas-pagination"></div>
             </div>
           </div>
         </section>
 
-        <!-- ==================== PENGATURAN (langsung) ==================== -->
+        <!-- ==================== PENGATURAN ==================== -->
         <section id="view-pengaturan" class="view">
           <h2 class="section-title">Pengaturan Koneksi Google Sheets</h2>
           <p class="section-sub">Tempel URL Web App dari Google Apps Script di sini.</p>
@@ -619,10 +668,14 @@
 const SKIP_LOGIN = true;
 const APP_PASSWORD = 'isakuiki2026';
 const SESSION_KEY = 'isakuiki_auth';
+const PAGE_SIZE = 8;              /* <<< jumlah baris per halaman */
 
 const LS_URL_KEY = 'isakuiki_api_url';
 let API_URL = localStorage.getItem(LS_URL_KEY) || '';
 let transaksiData = [], itemData = [], timelineData = [], kasData = [];
+
+/* state halaman per tabel */
+const pageState = { trx: 1, item: 1, timeline: 1, kas: 1 };
 
 const PAGE_META = {
   dashboard:  { title:'Dashboard',         sub:'Ringkasan usaha & aktivitas' },
@@ -713,6 +766,68 @@ function setConnStatus(ok, text){
   document.getElementById('not-connected-banner').style.display = ok ? 'none' : 'block';
 }
 
+/* =====================================================
+   PAGINATION UTIL
+===================================================== */
+function paginate(rows, key){
+  const total = rows.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  let page = pageState[key] || 1;
+  if(page > totalPages) page = totalPages;
+  if(page < 1) page = 1;
+  pageState[key] = page;
+  const start = (page - 1) * PAGE_SIZE;
+  return { rows: rows.slice(start, start + PAGE_SIZE), page, totalPages, total };
+}
+
+function buildPagination(key, page, totalPages, total){
+  if(totalPages <= 1) return '';
+  let btns = '';
+  btns += `<button class="page-btn" ${page===1?'disabled':''} data-page-key="${key}" data-page-to="${page-1}">‹</button>`;
+
+  const maxBtns = 5;
+  let start = Math.max(1, page - Math.floor(maxBtns/2));
+  let end = Math.min(totalPages, start + maxBtns - 1);
+  if(end - start < maxBtns - 1) start = Math.max(1, end - maxBtns + 1);
+
+  if(start > 1){
+    btns += `<button class="page-btn" data-page-key="${key}" data-page-to="1">1</button>`;
+    if(start > 2) btns += `<span class="page-dots">…</span>`;
+  }
+  for(let i=start; i<=end; i++){
+    btns += `<button class="page-btn ${i===page?'active':''}" data-page-key="${key}" data-page-to="${i}">${i}</button>`;
+  }
+  if(end < totalPages){
+    if(end < totalPages - 1) btns += `<span class="page-dots">…</span>`;
+    btns += `<button class="page-btn" data-page-key="${key}" data-page-to="${totalPages}">${totalPages}</button>`;
+  }
+  btns += `<button class="page-btn" ${page===totalPages?'disabled':''} data-page-key="${key}" data-page-to="${page+1}">›</button>`;
+
+  return `<div class="pagination">
+    <span class="page-info">Halaman <b>${page}</b> / <b>${totalPages}</b> — ${total} data</span>
+    <div class="page-btns">${btns}</div>
+  </div>`;
+}
+
+/* Klik tombol pagination (delegasi) */
+document.addEventListener('click', e=>{
+  const btn = e.target.closest('.page-btn[data-page-key]');
+  if(!btn || btn.disabled) return;
+  const key = btn.dataset.pageKey;
+  const to = Number(btn.dataset.pageTo);
+  pageState[key] = to;
+  if(key==='trx') renderTransaksi();
+  if(key==='item') renderItem();
+  if(key==='timeline') renderTimeline();
+  if(key==='kas') renderKas();
+  /* scroll ke atas tabel */
+  const wrap = btn.closest('.panel')?.querySelector('.table-wrap');
+  if(wrap) wrap.scrollTop = 0;
+});
+
+/* =====================================================
+   API
+===================================================== */
 async function apiListAll(){
   if(!API_URL){ setConnStatus(false, 'Belum terhubung'); return; }
   try{
@@ -761,10 +876,8 @@ async function withBusy(btn, fn){
 }
 
 /* =====================================================
-   NAVIGASI DUA TINGKAT (menu utama -> sub-menu -> konten)
+   NAVIGASI
 ===================================================== */
-
-/* Tampilkan landing (daftar teks) di dalam view */
 function showLanding(viewEl){
   const landing = viewEl.querySelector('.menu-landing');
   if(!landing) return;
@@ -772,7 +885,6 @@ function showLanding(viewEl){
   viewEl.querySelectorAll('.menu-page').forEach(p=>p.hidden = true);
 }
 
-/* Tampilkan halaman tertentu di dalam view */
 function showPage(viewId, pageId, customTitle, customSub){
   const viewEl = document.getElementById(viewId);
   if(!viewEl) return;
@@ -784,9 +896,14 @@ function showPage(viewId, pageId, customTitle, customSub){
 
   if(customTitle) document.getElementById('page-title').textContent = customTitle;
   if(customSub)   document.getElementById('page-sub').textContent   = customSub;
+
+  /* reset halaman pagination sesuai tabel yg dibuka */
+  if(pageId==='proyek-dtrx'){ pageState.trx = 1; renderTransaksi(); }
+  if(pageId==='proyek-ditem'){ pageState.item = 1; renderItem(); }
+  if(pageId==='timeline-view'){ pageState.timeline = 1; renderTimeline(); renderTrack(); }
+  if(pageId==='kas-list'){ pageState.kas = 1; renderKas(); }
 }
 
-/* ---------- SIDEBAR TAB SWITCH ---------- */
 document.querySelectorAll('.side-menu button').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     const tab = btn.dataset.tab;
@@ -795,22 +912,17 @@ document.querySelectorAll('.side-menu button').forEach(btn=>{
     btn.classList.add('active');
     const view = document.getElementById('view-'+tab);
     view.classList.add('active');
-
-    // Reset ke landing kalau ada
     showLanding(view);
 
-    // Update topbar
     const meta = PAGE_META[tab] || { title:'', sub:'' };
     document.getElementById('page-title').textContent = meta.title;
     document.getElementById('page-sub').textContent = meta.sub;
 
-    if(tab==='timeline') renderTrack();
     if(window.innerWidth <= 900) closeSidebar();
     window.scrollTo({top:0, behavior:'smooth'});
   });
 });
 
-/* ---------- KLIK MENU CARD (sub-menu) ---------- */
 document.querySelectorAll('.menu-card').forEach(card=>{
   card.addEventListener('click', ()=>{
     const view = card.closest('.view');
@@ -822,7 +934,6 @@ document.querySelectorAll('.menu-card').forEach(card=>{
   });
 });
 
-/* ---------- TOMBOL KEMBALI ---------- */
 document.querySelectorAll('.back-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     const view = btn.closest('.view');
@@ -835,7 +946,9 @@ document.querySelectorAll('.back-btn').forEach(btn=>{
   });
 });
 
-/* ---------- SELECT PROYEK ---------- */
+/* =====================================================
+   SELECT PROYEK
+===================================================== */
 function populateProjectSelects(){
   const opts = transaksiData.map(t=>`<option value="${t.ID}">${transLabel(t)}</option>`).join('');
   const itemSel = document.getElementById('item-trx');
@@ -862,7 +975,9 @@ function renderAll(){
   renderDashboard();
 }
 
-/* ---------- TRANSAKSI ---------- */
+/* =====================================================
+   TRANSAKSI
+===================================================== */
 function clearTrxForm(){
   document.getElementById('trx-id').value='';
   ['trx-tanggal','trx-konsumen','trx-produsen','trx-diskon','trx-foto'].forEach(id=>document.getElementById(id).value='');
@@ -912,9 +1027,17 @@ function deleteTrx(id){
 
 function renderTransaksi(){
   const body = document.getElementById('trx-body');
+  const pagEl = document.getElementById('trx-pagination');
   if(!body) return;
-  if(transaksiData.length===0){ body.innerHTML = `<tr><td colspan="10" class="empty">Belum ada transaksi/proyek.</td></tr>`; return; }
-  body.innerHTML = transaksiData.map(t=>{
+
+  if(transaksiData.length===0){
+    body.innerHTML = `<tr><td colspan="10" class="empty">Belum ada transaksi/proyek.</td></tr>`;
+    if(pagEl) pagEl.innerHTML = '';
+    return;
+  }
+
+  /* map ke HTML rows */
+  const allRows = transaksiData.map(t=>{
     const agg = transaksiTotals(t.ID);
     return `<tr>
       <td>${fmtDate(t.Tanggal)}</td><td>${t.Konsumen||'-'}</td><td>${t.Produsen||'-'}</td>
@@ -925,10 +1048,16 @@ function renderTransaksi(){
       <td><button class="btn ghost small" onclick="editTrx('${t.ID}')">Edit</button>
           <button class="btn danger small" onclick="deleteTrx('${t.ID}')">Hapus</button></td>
     </tr>`;
-  }).join('');
+  });
+
+  const p = paginate(allRows, 'trx');
+  body.innerHTML = p.rows.join('') || `<tr><td colspan="10" class="empty">-</td></tr>`;
+  if(pagEl) pagEl.innerHTML = buildPagination('trx', p.page, p.totalPages, p.total);
 }
 
-/* ---------- ITEM BARANG ---------- */
+/* =====================================================
+   ITEM BARANG
+===================================================== */
 function clearItemForm(){
   document.getElementById('item-id').value='';
   ['item-jenis','item-qty','item-modal','item-jual'].forEach(id=>document.getElementById(id).value='');
@@ -986,9 +1115,16 @@ function deleteItem(id){
 
 function renderItem(){
   const body = document.getElementById('item-body');
+  const pagEl = document.getElementById('item-pagination');
   if(!body) return;
-  if(itemData.length===0){ body.innerHTML = `<tr><td colspan="7" class="empty">Belum ada item barang.</td></tr>`; return; }
-  body.innerHTML = itemData.map(i=>{
+
+  if(itemData.length===0){
+    body.innerHTML = `<tr><td colspan="7" class="empty">Belum ada item barang.</td></tr>`;
+    if(pagEl) pagEl.innerHTML = '';
+    return;
+  }
+
+  const allRows = itemData.map(i=>{
     const t = transaksiData.find(x=>x.ID===i.TransaksiID);
     const qty = Number(i.Qty||0);
     const modalUnit = Number(i.Modal||0);
@@ -998,10 +1134,16 @@ function renderItem(){
       <td><button class="btn ghost small" onclick="editItem('${i.ID}')">Edit</button>
           <button class="btn danger small" onclick="deleteItem('${i.ID}')">Hapus</button></td>
     </tr>`;
-  }).join('');
+  });
+
+  const p = paginate(allRows, 'item');
+  body.innerHTML = p.rows.join('') || `<tr><td colspan="7" class="empty">-</td></tr>`;
+  if(pagEl) pagEl.innerHTML = buildPagination('item', p.page, p.totalPages, p.total);
 }
 
-/* ---------- TIMELINE ---------- */
+/* =====================================================
+   TIMELINE
+===================================================== */
 const TAHAP_ORDER = ["Order Diterima","Proses Produksi di Produsen","QC / Selesai Produksi","Pengiriman ke Konsumen","Diterima Konsumen","Pelunasan"];
 
 function clearTimelineForm(){
@@ -1074,9 +1216,16 @@ function deleteTimeline(id){
 
 function renderTimeline(){
   const body = document.getElementById('timeline-body');
+  const pagEl = document.getElementById('timeline-pagination');
   if(!body) return;
-  if(timelineData.length===0){ body.innerHTML = `<tr><td colspan="7" class="empty">Belum ada data timeline.</td></tr>`; return; }
-  body.innerHTML = timelineData.map(t=>{
+
+  if(timelineData.length===0){
+    body.innerHTML = `<tr><td colspan="7" class="empty">Belum ada data timeline.</td></tr>`;
+    if(pagEl) pagEl.innerHTML = '';
+    return;
+  }
+
+  const allRows = timelineData.map(t=>{
     const p = transaksiData.find(x=>x.ID===t.ProjekID);
     return `<tr>
       <td>${p?transLabel(p):'(proyek dihapus)'}</td><td>${t.Tahap}</td>
@@ -1085,10 +1234,16 @@ function renderTimeline(){
       <td><button class="btn ghost small" onclick="editTimeline('${t.ID}')">Edit</button>
           <button class="btn danger small" onclick="deleteTimeline('${t.ID}')">Hapus</button></td>
     </tr>`;
-  }).join('');
+  });
+
+  const pg = paginate(allRows, 'timeline');
+  body.innerHTML = pg.rows.join('') || `<tr><td colspan="7" class="empty">-</td></tr>`;
+  if(pagEl) pagEl.innerHTML = buildPagination('timeline', pg.page, pg.totalPages, pg.total);
 }
 
-/* ---------- KAS ---------- */
+/* =====================================================
+   KAS
+===================================================== */
 function clearKasForm(){
   document.getElementById('k-id').value='';
   document.getElementById('k-tanggal').value=''; document.getElementById('k-jumlah').value='';
@@ -1139,11 +1294,19 @@ function deleteKas(id){
 
 function renderKas(){
   const body = document.getElementById('kas-body');
+  const pagEl = document.getElementById('kas-pagination');
   if(!body) return;
-  if(kasData.length===0){ body.innerHTML = `<tr><td colspan="8" class="empty">Belum ada transaksi kas.</td></tr>`; return; }
+
+  if(kasData.length===0){
+    body.innerHTML = `<tr><td colspan="8" class="empty">Belum ada transaksi kas.</td></tr>`;
+    if(pagEl) pagEl.innerHTML = '';
+    return;
+  }
+
+  /* hitung saldo berjalan dulu untuk seluruh data (urut naik) */
   const sorted = [...kasData].sort((a,b)=> String(a.Tanggal||'').localeCompare(String(b.Tanggal||'')));
   let saldo = 0;
-  const rows = sorted.map(k=>{
+  const allRows = sorted.map(k=>{
     const jumlah = Number(k.Jumlah||0);
     saldo += k.Jenis==='Masuk' ? jumlah : -jumlah;
     const p = transaksiData.find(x=>x.ID===k.ProjekID);
@@ -1155,10 +1318,17 @@ function renderKas(){
           <button class="btn danger small" onclick="deleteKas('${k.ID}')">Hapus</button></td>
     </tr>`;
   });
-  body.innerHTML = rows.reverse().join('');
+
+  /* tampilkan dari yg terbaru: balik urutannya, baru paginate */
+  allRows.reverse();
+  const pg = paginate(allRows, 'kas');
+  body.innerHTML = pg.rows.join('') || `<tr><td colspan="8" class="empty">-</td></tr>`;
+  if(pagEl) pagEl.innerHTML = buildPagination('kas', pg.page, pg.totalPages, pg.total);
 }
 
-/* ---------- DASHBOARD ---------- */
+/* =====================================================
+   DASHBOARD
+===================================================== */
 function renderDashboard(){
   const masuk = kasData.filter(k=>k.Jenis==='Masuk').reduce((s,k)=>s+Number(k.Jumlah||0),0);
   const keluar = kasData.filter(k=>k.Jenis==='Keluar').reduce((s,k)=>s+Number(k.Jumlah||0),0);
@@ -1188,7 +1358,9 @@ function renderDashboard(){
   }
 }
 
-/* ---------- PENGATURAN ---------- */
+/* =====================================================
+   PENGATURAN
+===================================================== */
 document.getElementById('api-url').value = API_URL;
 document.getElementById('save-url').addEventListener('click', ()=>{
   const val = document.getElementById('api-url').value.trim();
