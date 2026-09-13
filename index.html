@@ -129,7 +129,6 @@
   td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top;}
   tr:hover td{background:#FBF8F1;}
 
-  /* Table wrap dengan scroll internal + header sticky */
   .table-wrap{
     overflow:auto;
     border-radius:8px;
@@ -203,7 +202,7 @@
   .menu-card .mc-sub{font-size:12.5px;color:var(--ink-soft);font-weight:500;}
   .menu-card .arrow{margin-left:auto;color:var(--brass);font-weight:700;font-size:18px;flex-shrink:0;}
 
-  /* ================== PAGE HEAD STICKY (di dalam sub-menu) ================== */
+  /* ================== PAGE HEAD STICKY ================== */
   .menu-page .page-head{
     position:sticky;
     top:var(--topbar-h);
@@ -224,7 +223,7 @@
   .menu-page .page-head .section-title{margin-bottom:2px;font-size:19px;}
   .menu-page .page-head .section-sub{margin:0;font-size:13px;}
 
-  /* ================== WORK AREA (2 kolom) ================== */
+  /* ================== WORK AREA ================== */
   .form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;}
   .form-grid-2 .panel{margin-bottom:0;}
 
@@ -644,6 +643,7 @@
             <div class="actions-row">
               <button class="btn primary" id="save-url">Simpan & Sambungkan</button>
               <button class="btn ghost" id="refresh-data">Muat Ulang Data</button>
+              <button class="btn ghost" id="reset-url">Reset URL</button>
             </div>
             <p class="section-sub" style="margin-top:14px;">
               Cara mendapatkan URL ini: buka Google Sheets → <b>Extensions &gt; Apps Script</b> → tempel kode
@@ -662,19 +662,29 @@
 <script>
 /* ===========================================================
    PENGATURAN CEPAT
+   -----------------------------------------------------------
    SKIP_LOGIN = true  -> password dimatikan (preview)
    SKIP_LOGIN = false -> password aktif (GitHub)
+
+   DEFAULT_API_URL    -> URL Google Apps Script (Web App)
+                         Dipakai jika localStorage belum ada isinya.
 =========================================================== */
 const SKIP_LOGIN = true;
 const APP_PASSWORD = 'isakuiki2026';
 const SESSION_KEY = 'isakuiki_auth';
-const PAGE_SIZE = 8;              /* <<< jumlah baris per halaman */
+const PAGE_SIZE = 8;
+
+/* >>>>>>>>>  URL GOOGLE APPS SCRIPT ANDA  <<<<<<<<< */
+const DEFAULT_API_URL = 'https://script.google.com/macros/s/AKfycbz9bsMrO1JyFR_4B87ADqz4imQ9LILo-D7KcbreqpZduFPIWnY3JY6oiq3jTa-jBi-A/exec';
 
 const LS_URL_KEY = 'isakuiki_api_url';
-let API_URL = localStorage.getItem(LS_URL_KEY) || '';
+/* Ambil dari localStorage, kalau belum ada pakai DEFAULT_API_URL */
+let API_URL = localStorage.getItem(LS_URL_KEY) || DEFAULT_API_URL;
+/* Simpan default ke localStorage agar konsisten */
+if(!localStorage.getItem(LS_URL_KEY)) localStorage.setItem(LS_URL_KEY, API_URL);
+
 let transaksiData = [], itemData = [], timelineData = [], kasData = [];
 
-/* state halaman per tabel */
 const pageState = { trx: 1, item: 1, timeline: 1, kas: 1 };
 
 const PAGE_META = {
@@ -702,6 +712,9 @@ function unlockApp(){
   document.getElementById('app-content').classList.remove('hidden');
   document.getElementById('trx-tanggal').value = new Date().toISOString().slice(0,10);
   document.getElementById('k-tanggal').value = new Date().toISOString().slice(0,10);
+  /* isi field URL dengan API_URL supaya kelihatan di pengaturan */
+  const urlInput = document.getElementById('api-url');
+  if(urlInput) urlInput.value = API_URL;
   if(API_URL) apiListAll(); else setConnStatus(false, 'Belum terhubung');
 }
 
@@ -767,7 +780,7 @@ function setConnStatus(ok, text){
 }
 
 /* =====================================================
-   PAGINATION UTIL
+   PAGINATION
 ===================================================== */
 function paginate(rows, key){
   const total = rows.length;
@@ -809,7 +822,6 @@ function buildPagination(key, page, totalPages, total){
   </div>`;
 }
 
-/* Klik tombol pagination (delegasi) */
 document.addEventListener('click', e=>{
   const btn = e.target.closest('.page-btn[data-page-key]');
   if(!btn || btn.disabled) return;
@@ -820,7 +832,6 @@ document.addEventListener('click', e=>{
   if(key==='item') renderItem();
   if(key==='timeline') renderTimeline();
   if(key==='kas') renderKas();
-  /* scroll ke atas tabel */
   const wrap = btn.closest('.panel')?.querySelector('.table-wrap');
   if(wrap) wrap.scrollTop = 0;
 });
@@ -897,7 +908,6 @@ function showPage(viewId, pageId, customTitle, customSub){
   if(customTitle) document.getElementById('page-title').textContent = customTitle;
   if(customSub)   document.getElementById('page-sub').textContent   = customSub;
 
-  /* reset halaman pagination sesuai tabel yg dibuka */
   if(pageId==='proyek-dtrx'){ pageState.trx = 1; renderTransaksi(); }
   if(pageId==='proyek-ditem'){ pageState.item = 1; renderItem(); }
   if(pageId==='timeline-view'){ pageState.timeline = 1; renderTimeline(); renderTrack(); }
@@ -1036,7 +1046,6 @@ function renderTransaksi(){
     return;
   }
 
-  /* map ke HTML rows */
   const allRows = transaksiData.map(t=>{
     const agg = transaksiTotals(t.ID);
     return `<tr>
@@ -1303,7 +1312,6 @@ function renderKas(){
     return;
   }
 
-  /* hitung saldo berjalan dulu untuk seluruh data (urut naik) */
   const sorted = [...kasData].sort((a,b)=> String(a.Tanggal||'').localeCompare(String(b.Tanggal||'')));
   let saldo = 0;
   const allRows = sorted.map(k=>{
@@ -1319,7 +1327,6 @@ function renderKas(){
     </tr>`;
   });
 
-  /* tampilkan dari yg terbaru: balik urutannya, baru paginate */
   allRows.reverse();
   const pg = paginate(allRows, 'kas');
   body.innerHTML = pg.rows.join('') || `<tr><td colspan="8" class="empty">-</td></tr>`;
@@ -1362,6 +1369,7 @@ function renderDashboard(){
    PENGATURAN
 ===================================================== */
 document.getElementById('api-url').value = API_URL;
+
 document.getElementById('save-url').addEventListener('click', ()=>{
   const val = document.getElementById('api-url').value.trim();
   if(!val){ alert('Masukkan URL Web App terlebih dahulu.'); return; }
@@ -1369,7 +1377,16 @@ document.getElementById('save-url').addEventListener('click', ()=>{
   localStorage.setItem(LS_URL_KEY, API_URL);
   apiListAll();
 });
+
 document.getElementById('refresh-data').addEventListener('click', apiListAll);
+
+document.getElementById('reset-url').addEventListener('click', ()=>{
+  if(!confirm('Kembalikan URL ke default?')) return;
+  API_URL = DEFAULT_API_URL;
+  localStorage.setItem(LS_URL_KEY, API_URL);
+  document.getElementById('api-url').value = API_URL;
+  apiListAll();
+});
 </script>
 </body>
 </html>
