@@ -142,6 +142,39 @@
   ::placeholder{color:#B7AC98;}
   code.inline{background:var(--brass-light);padding:2px 6px;border-radius:5px;font-size:12.5px;}
 
+  /* ================== MENU LANDING (daftar teks) ================== */
+  .menu-landing{padding:4px 0;}
+  .menu-cards{display:flex;flex-direction:column;gap:10px;max-width:560px;}
+  .menu-card{
+    display:flex;align-items:center;gap:14px;
+    background:var(--paper);border:1px solid var(--line);
+    border-radius:12px;padding:16px 20px;
+    font-family:'Source Sans 3',sans-serif;font-size:15px;font-weight:600;color:var(--ink);
+    cursor:pointer;text-align:left;transition:.15s;width:100%;
+    box-shadow:var(--shadow);
+  }
+  .menu-card:hover{background:var(--brass-light);border-color:var(--brass);transform:translateX(3px);}
+  .menu-card .mc-icon{
+    width:38px;height:38px;border-radius:10px;background:var(--brass-light);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    font-size:18px;
+  }
+  .menu-card .mc-text{display:flex;flex-direction:column;gap:2px;flex:1;}
+  .menu-card .mc-title{font-weight:700;color:var(--wood-dark);font-size:15px;}
+  .menu-card .mc-sub{font-size:12.5px;color:var(--ink-soft);font-weight:500;}
+  .menu-card .arrow{margin-left:auto;color:var(--brass);font-weight:700;font-size:18px;flex-shrink:0;}
+
+  /* ================== BACK BUTTON ================== */
+  .back-btn{
+    display:inline-flex;align-items:center;gap:6px;
+    background:transparent;border:none;
+    color:var(--wood-dark);font-weight:600;font-size:14px;
+    padding:7px 12px;margin-bottom:14px;border-radius:7px;
+    cursor:pointer;font-family:inherit;transition:.15s;
+  }
+  .back-btn:hover{background:var(--brass-light);}
+  .back-btn::before{content:"←";font-weight:700;color:var(--brass);}
+
   /* ================== WORK AREA (form sticky + tabel) ================== */
   .work-area{
     display:grid;
@@ -155,23 +188,17 @@
   .work-main{display:flex;flex-direction:column;gap:20px;}
   .work-area .panel{margin-bottom:0;}
 
+  /* dua form sejajar */
+  .form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;}
+  .form-grid-2 .panel{margin-bottom:0;}
+
   @media (max-width: 1100px){
     .work-area{grid-template-columns:1fr;}
     .work-side{position:static;}
+    .form-grid-2{grid-template-columns:1fr;}
   }
 
-  /* ================== SUB TABS ================== */
-  .subtabs{display:flex;gap:4px;margin-bottom:18px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
-  .subtabs button{
-    background:transparent;border:none;padding:10px 16px;
-    font-size:14px;font-weight:600;color:var(--ink-soft);cursor:pointer;
-    border-bottom:2px solid transparent;margin-bottom:-1px;
-    font-family:'Source Sans 3',sans-serif;transition:.15s;
-  }
-  .subtabs button:hover{color:var(--wood-dark);}
-  .subtabs button.active{color:var(--wood-dark);border-bottom-color:var(--brass);}
-  .subpane{display:none;}
-  .subpane.active{display:block;animation:fade .2s ease;}
+  .menu-page[hidden]{display:none;}
 
   /* ================== LOCK SCREEN ================== */
   #lock-screen{
@@ -281,7 +308,7 @@
           Aplikasi belum tersambung ke Google Sheets. Buka menu <b>Pengaturan</b> untuk memasukkan URL API terlebih dahulu.
         </div>
 
-        <!-- DASHBOARD -->
+        <!-- ==================== DASHBOARD (langsung) ==================== -->
         <section id="view-dashboard" class="view active">
           <h2 class="section-title">Ringkasan Usaha</h2>
           <p class="section-sub">Data langsung dari Google Sheets.</p>
@@ -302,180 +329,258 @@
           </div>
         </section>
 
-        <!-- PROYEK -->
+        <!-- ==================== PROYEK ==================== -->
         <section id="view-proyek" class="view">
-          <h2 class="section-title">Data Proyek</h2>
-          <p class="section-sub">1 Transaksi bisa berisi beberapa Item. Keuntungan = (Total Jual − Diskon) − Total Modal.</p>
 
-          <div class="subtabs">
-            <button data-subtab="trx" class="active">📋 Transaksi / Proyek</button>
-            <button data-subtab="item">📦 Item Barang</button>
+          <!-- Landing: daftar teks -->
+          <div class="menu-landing" id="landing-proyek">
+            <h2 class="section-title">Menu Proyek &amp; Item</h2>
+            <p class="section-sub">Pilih menu di bawah ini:</p>
+            <div class="menu-cards">
+              <button class="menu-card" data-target="proyek-input" data-title="Input Data Proyek" data-sub="Tambah transaksi & item barang">
+                <span class="mc-icon">📝</span>
+                <span class="mc-text">
+                  <span class="mc-title">Data Proyek (Transaksi &amp; Item Barang)</span>
+                  <span class="mc-sub">Form input untuk menambah / mengedit</span>
+                </span>
+                <span class="arrow">›</span>
+              </button>
+              <button class="menu-card" data-target="proyek-dtrx" data-title="Daftar Transaksi" data-sub="Semua proyek yang tercatat">
+                <span class="mc-icon">📋</span>
+                <span class="mc-text">
+                  <span class="mc-title">Daftar Transaksi (Proyek)</span>
+                  <span class="mc-sub">Lihat semua transaksi & keuntungan</span>
+                </span>
+                <span class="arrow">›</span>
+              </button>
+              <button class="menu-card" data-target="proyek-ditem" data-title="Daftar Item Barang" data-sub="Semua item yang tercatat">
+                <span class="mc-icon">🗂️</span>
+                <span class="mc-text">
+                  <span class="mc-title">Daftar Item Barang</span>
+                  <span class="mc-sub">Lihat semua item dari setiap transaksi</span>
+                </span>
+                <span class="arrow">›</span>
+              </button>
+            </div>
           </div>
 
-          <div class="subpane active" id="subpane-trx">
-            <div class="work-area">
-              <div class="work-side">
-                <div class="panel">
-                  <h3 id="trx-form-title">Tambah Transaksi Baru</h3>
-                  <input type="hidden" id="trx-id">
-                  <div class="grid-form">
-                    <div class="field"><label>Tanggal Order</label><input type="date" id="trx-tanggal"></div>
-                    <div class="field"><label>Nama Konsumen</label><input type="text" id="trx-konsumen" placeholder="cth. Bu Sari"></div>
-                    <div class="field"><label>Nama Produsen</label><input type="text" id="trx-produsen" placeholder="cth. CV Kayu Jati"></div>
-                    <div class="field"><label>Status Proyek</label>
-                      <select id="trx-status">
-                        <option>Menunggu Produksi</option><option>Diproses Produsen</option><option>QC/Selesai Produksi</option>
-                        <option>Dikirim</option><option>Diterima Konsumen</option><option>Lunas & Selesai</option><option>Batal</option>
-                      </select>
-                    </div>
-                    <div class="field"><label>Diskon Total (Rp)</label><input type="number" id="trx-diskon" placeholder="0"></div>
-                    <div class="field"><label>Link Foto</label><input type="url" id="trx-foto" placeholder="https://drive.google.com/..."></div>
+          <!-- Halaman: Input Data Proyek (2 form) -->
+          <div class="menu-page" id="page-proyek-input" hidden>
+            <button class="back-btn" data-back>Kembali ke Menu</button>
+            <h2 class="section-title">Input Data Proyek</h2>
+            <p class="section-sub">Isi form Transaksi lalu tambahkan Item barangnya.</p>
+
+            <div class="form-grid-2">
+              <div class="panel">
+                <h3 id="trx-form-title">Tambah Transaksi Baru</h3>
+                <input type="hidden" id="trx-id">
+                <div class="grid-form">
+                  <div class="field" style="grid-column:1/-1;"><label>Tanggal Order</label><input type="date" id="trx-tanggal"></div>
+                  <div class="field"><label>Nama Konsumen</label><input type="text" id="trx-konsumen" placeholder="cth. Bu Sari"></div>
+                  <div class="field"><label>Nama Produsen</label><input type="text" id="trx-produsen" placeholder="cth. CV Kayu Jati"></div>
+                  <div class="field" style="grid-column:1/-1;"><label>Status Proyek</label>
+                    <select id="trx-status">
+                      <option>Menunggu Produksi</option><option>Diproses Produsen</option><option>QC/Selesai Produksi</option>
+                      <option>Dikirim</option><option>Diterima Konsumen</option><option>Lunas & Selesai</option><option>Batal</option>
+                    </select>
                   </div>
-                  <div class="actions-row">
-                    <button class="btn primary" id="trx-save">Simpan Transaksi</button>
-                    <button class="btn ghost" id="trx-cancel" style="display:none;">Batal Edit</button>
-                  </div>
+                  <div class="field"><label>Diskon Total (Rp)</label><input type="number" id="trx-diskon" placeholder="0"></div>
+                  <div class="field"><label>Link Foto</label><input type="url" id="trx-foto" placeholder="https://drive.google.com/..."></div>
+                </div>
+                <div class="actions-row">
+                  <button class="btn primary" id="trx-save">Simpan Transaksi</button>
+                  <button class="btn ghost" id="trx-cancel" style="display:none;">Batal Edit</button>
                 </div>
               </div>
-              <div class="work-main">
-                <div class="panel">
-                  <h3>Daftar Transaksi (Proyek)</h3>
-                  <div class="table-wrap"><table>
-                    <thead><tr><th>Tgl</th><th>Konsumen</th><th>Produsen</th><th>Modal</th><th>Jual</th><th>Diskon</th><th>Untung</th><th>Status</th><th>Foto</th><th>Aksi</th></tr></thead>
-                    <tbody id="trx-body"></tbody>
-                  </table></div>
+
+              <div class="panel">
+                <h3 id="item-form-title">Tambah Item Barang</h3>
+                <input type="hidden" id="item-id">
+                <div class="grid-form">
+                  <div class="field" style="grid-column:1/-1;"><label>Transaksi</label><select id="item-trx"></select></div>
+                  <div class="field" style="grid-column:1/-1;"><label>Jenis Barang / Pekerjaan</label><input type="text" id="item-jenis" placeholder="cth. Kursi Tamu Set"></div>
+                  <div class="field"><label>Qty</label><input type="number" id="item-qty" placeholder="1" min="0" step="1"></div>
+                  <div class="field"><label>Modal / Unit (Rp)</label><input type="number" id="item-modal" placeholder="1000000"></div>
+                  <div class="field" style="grid-column:1/-1;"><label>Harga Jual Total</label><input type="number" id="item-jual" placeholder="otomatis = Qty × Modal × 1.1"></div>
+                </div>
+                <p class="section-sub" style="margin:10px 0 0;font-size:12px;">Harga Jual otomatis terisi = Qty × Modal × 1.1 (margin 10%). Bisa diubah manual.</p>
+                <div class="actions-row">
+                  <button class="btn primary" id="item-save">Simpan Item</button>
+                  <button class="btn ghost" id="item-cancel" style="display:none;">Batal Edit</button>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="subpane" id="subpane-item">
-            <div class="work-area">
-              <div class="work-side">
-                <div class="panel">
-                  <h3 id="item-form-title">Tambah Item Barang</h3>
-                  <input type="hidden" id="item-id">
-                  <div class="grid-form">
-                    <div class="field" style="grid-column:1/-1;"><label>Transaksi</label><select id="item-trx"></select></div>
-                    <div class="field" style="grid-column:1/-1;"><label>Jenis Barang / Pekerjaan</label><input type="text" id="item-jenis" placeholder="cth. Kursi Tamu Set"></div>
-                    <div class="field"><label>Qty</label><input type="number" id="item-qty" placeholder="1" min="0" step="1"></div>
-                    <div class="field"><label>Modal / Unit (Rp)</label><input type="number" id="item-modal" placeholder="1000000"></div>
-                    <div class="field" style="grid-column:1/-1;"><label>Harga Jual Total</label><input type="number" id="item-jual" placeholder="otomatis = Qty × Modal × 1.1"></div>
-                  </div>
-                  <p class="section-sub" style="margin:10px 0 0;font-size:12px;">Harga Jual otomatis terisi = Qty × Modal × 1.1 (margin 10%). Bisa diubah manual.</p>
-                  <div class="actions-row">
-                    <button class="btn primary" id="item-save">Simpan Item</button>
-                    <button class="btn ghost" id="item-cancel" style="display:none;">Batal Edit</button>
-                  </div>
-                </div>
-              </div>
-              <div class="work-main">
-                <div class="panel">
-                  <h3>Daftar Item Barang</h3>
-                  <div class="table-wrap"><table>
-                    <thead><tr><th>Transaksi</th><th>Jenis Barang</th><th>Qty</th><th>Modal/Unit</th><th>Total Modal</th><th>Jual</th><th>Aksi</th></tr></thead>
-                    <tbody id="item-body"></tbody>
-                  </table></div>
-                </div>
-              </div>
+          <!-- Halaman: Daftar Transaksi -->
+          <div class="menu-page" id="page-proyek-dtrx" hidden>
+            <button class="back-btn" data-back>Kembali ke Menu</button>
+            <h2 class="section-title">Daftar Transaksi (Proyek)</h2>
+            <p class="section-sub">Semua transaksi yang tercatat beserta keuntungannya.</p>
+            <div class="panel">
+              <div class="table-wrap"><table>
+                <thead><tr><th>Tgl</th><th>Konsumen</th><th>Produsen</th><th>Modal</th><th>Jual</th><th>Diskon</th><th>Untung</th><th>Status</th><th>Foto</th><th>Aksi</th></tr></thead>
+                <tbody id="trx-body"></tbody>
+              </table></div>
+            </div>
+          </div>
+
+          <!-- Halaman: Daftar Item -->
+          <div class="menu-page" id="page-proyek-ditem" hidden>
+            <button class="back-btn" data-back>Kembali ke Menu</button>
+            <h2 class="section-title">Daftar Item Barang</h2>
+            <p class="section-sub">Semua item dari setiap transaksi.</p>
+            <div class="panel">
+              <div class="table-wrap"><table>
+                <thead><tr><th>Transaksi</th><th>Jenis Barang</th><th>Qty</th><th>Modal/Unit</th><th>Total Modal</th><th>Jual</th><th>Aksi</th></tr></thead>
+                <tbody id="item-body"></tbody>
+              </table></div>
             </div>
           </div>
         </section>
 
-        <!-- TIMELINE -->
+        <!-- ==================== TIMELINE ==================== -->
         <section id="view-timeline" class="view">
-          <h2 class="section-title">Timeline Progres Produksi</h2>
-          <p class="section-sub">Pantau tahap barang dari produsen sampai diterima konsumen.</p>
 
-          <div class="work-area">
-            <div class="work-side">
-              <div class="panel">
-                <h3 id="t-form-title">Tambah / Update Tahap</h3>
-                <input type="hidden" id="t-id">
-                <div class="grid-form">
-                  <div class="field" style="grid-column:1/-1;"><label>Proyek</label><select id="t-proyek"></select></div>
-                  <div class="field" style="grid-column:1/-1;"><label>Tahap</label>
-                    <select id="t-tahap">
-                      <option>Order Diterima</option><option>Proses Produksi di Produsen</option><option>QC / Selesai Produksi</option>
-                      <option>Pengiriman ke Konsumen</option><option>Diterima Konsumen</option><option>Pelunasan</option>
-                    </select>
-                  </div>
-                  <div class="field"><label>Tanggal Mulai</label><input type="date" id="t-mulai"></div>
-                  <div class="field"><label>Tanggal Selesai</label><input type="date" id="t-selesai"></div>
-                  <div class="field" style="grid-column:1/-1;"><label>Status Tahap</label>
-                    <select id="t-status"><option>Belum Mulai</option><option>Sedang Berjalan</option><option>Selesai</option><option>Terlambat</option></select>
-                  </div>
-                  <div class="field" style="grid-column:1/-1;"><label>Catatan</label><textarea id="t-catatan" placeholder="cth. Menunggu bahan baku kayu jati"></textarea></div>
+          <div class="menu-landing" id="landing-timeline">
+            <h2 class="section-title">Menu Timeline Progres</h2>
+            <p class="section-sub">Pilih menu di bawah ini:</p>
+            <div class="menu-cards">
+              <button class="menu-card" data-target="timeline-form" data-title="Tambah / Update Tahap" data-sub="Catat progres produksi">
+                <span class="mc-icon">➕</span>
+                <span class="mc-text">
+                  <span class="mc-title">Tambah / Update Tahap</span>
+                  <span class="mc-sub">Input tahap baru atau edit tahap yang ada</span>
+                </span>
+                <span class="arrow">›</span>
+              </button>
+              <button class="menu-card" data-target="timeline-view" data-title="Progres & Riwayat" data-sub="Pantau semua tahap produksi">
+                <span class="mc-icon">📊</span>
+                <span class="mc-text">
+                  <span class="mc-title">Progres Proyek &amp; Riwayat Tahap</span>
+                  <span class="mc-sub">Lihat progres visual dan seluruh riwayat</span>
+                </span>
+                <span class="arrow">›</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="menu-page" id="page-timeline-form" hidden>
+            <button class="back-btn" data-back>Kembali ke Menu</button>
+            <h2 class="section-title">Tambah / Update Tahap</h2>
+            <p class="section-sub">Catat tahap produksi untuk setiap proyek.</p>
+            <div class="panel" style="max-width:640px;">
+              <input type="hidden" id="t-id">
+              <div class="grid-form">
+                <div class="field" style="grid-column:1/-1;"><label>Proyek</label><select id="t-proyek"></select></div>
+                <div class="field" style="grid-column:1/-1;"><label>Tahap</label>
+                  <select id="t-tahap">
+                    <option>Order Diterima</option><option>Proses Produksi di Produsen</option><option>QC / Selesai Produksi</option>
+                    <option>Pengiriman ke Konsumen</option><option>Diterima Konsumen</option><option>Pelunasan</option>
+                  </select>
                 </div>
-                <div class="actions-row">
-                  <button class="btn primary" id="t-save">Simpan Tahap</button>
-                  <button class="btn ghost" id="t-cancel" style="display:none;">Batal Edit</button>
+                <div class="field"><label>Tanggal Mulai</label><input type="date" id="t-mulai"></div>
+                <div class="field"><label>Tanggal Selesai</label><input type="date" id="t-selesai"></div>
+                <div class="field" style="grid-column:1/-1;"><label>Status Tahap</label>
+                  <select id="t-status"><option>Belum Mulai</option><option>Sedang Berjalan</option><option>Selesai</option><option>Terlambat</option></select>
                 </div>
+                <div class="field" style="grid-column:1/-1;"><label>Catatan</label><textarea id="t-catatan" placeholder="cth. Menunggu bahan baku kayu jati"></textarea></div>
+              </div>
+              <div class="actions-row">
+                <button class="btn primary" id="t-save">Simpan Tahap</button>
+                <button class="btn ghost" id="t-cancel" style="display:none;">Batal Edit</button>
               </div>
             </div>
-            <div class="work-main">
-              <div class="panel">
-                <h3>Progres Proyek Terpilih</h3>
-                <div class="field" style="margin-bottom:10px;">
-                  <label>Pilih Proyek</label>
-                  <select id="t-proyek-select"></select>
-                </div>
-                <p class="section-sub" id="t-track-empty" style="margin:0;">Pilih proyek di atas untuk melihat progres.</p>
-                <div class="timeline-track" id="t-track"></div>
+          </div>
+
+          <div class="menu-page" id="page-timeline-view" hidden>
+            <button class="back-btn" data-back>Kembali ke Menu</button>
+            <h2 class="section-title">Progres Proyek &amp; Riwayat Tahap</h2>
+            <p class="section-sub">Pantau tahap barang dari produsen sampai diterima konsumen.</p>
+            <div class="panel">
+              <div class="field" style="margin-bottom:10px;max-width:420px;">
+                <label>Pilih Proyek</label>
+                <select id="t-proyek-select"></select>
               </div>
-              <div class="panel">
-                <h3>Semua Riwayat Tahap</h3>
-                <div class="table-wrap"><table>
-                  <thead><tr><th>Proyek</th><th>Tahap</th><th>Mulai</th><th>Selesai</th><th>Status</th><th>Catatan</th><th>Aksi</th></tr></thead>
-                  <tbody id="timeline-body"></tbody>
-                </table></div>
-              </div>
+              <p class="section-sub" id="t-track-empty" style="margin:0;">Pilih proyek di atas untuk melihat progres.</p>
+              <div class="timeline-track" id="t-track"></div>
+            </div>
+            <div class="panel">
+              <h3>Semua Riwayat Tahap</h3>
+              <div class="table-wrap"><table>
+                <thead><tr><th>Proyek</th><th>Tahap</th><th>Mulai</th><th>Selesai</th><th>Status</th><th>Catatan</th><th>Aksi</th></tr></thead>
+                <tbody id="timeline-body"></tbody>
+              </table></div>
             </div>
           </div>
         </section>
 
-        <!-- KAS -->
+        <!-- ==================== KAS ==================== -->
         <section id="view-kas" class="view">
-          <h2 class="section-title">Buku Kas — Uang Masuk & Keluar</h2>
-          <p class="section-sub">Catat DP, pelunasan, pembayaran ke produsen, dan biaya lain.</p>
 
-          <div class="work-area">
-            <div class="work-side">
-              <div class="panel">
-                <h3 id="k-form-title">Tambah Transaksi</h3>
-                <input type="hidden" id="k-id">
-                <div class="grid-form">
-                  <div class="field"><label>Tanggal</label><input type="date" id="k-tanggal"></div>
-                  <div class="field"><label>Jenis</label><select id="k-jenis"><option>Masuk</option><option>Keluar</option></select></div>
-                  <div class="field" style="grid-column:1/-1;"><label>Proyek Terkait</label><select id="k-proyek"><option value="">(Umum / Tidak terkait proyek)</option></select></div>
-                  <div class="field" style="grid-column:1/-1;"><label>Kategori</label>
-                    <select id="k-kategori">
-                      <option>DP Konsumen</option><option>Pelunasan Konsumen</option><option>Bayar ke Produsen</option>
-                      <option>Ongkos Kirim</option><option>Biaya Operasional</option><option>Lainnya</option>
-                    </select>
-                  </div>
-                  <div class="field" style="grid-column:1/-1;"><label>Jumlah (Rp)</label><input type="number" id="k-jumlah" placeholder="500000"></div>
-                  <div class="field" style="grid-column:1/-1;"><label>Keterangan</label><input type="text" id="k-keterangan" placeholder="cth. DP 50% dari Bu Sari"></div>
+          <div class="menu-landing" id="landing-kas">
+            <h2 class="section-title">Menu Buku Kas</h2>
+            <p class="section-sub">Pilih menu di bawah ini:</p>
+            <div class="menu-cards">
+              <button class="menu-card" data-target="kas-form" data-title="Tambah Transaksi Kas" data-sub="Catat uang masuk / keluar">
+                <span class="mc-icon">➕</span>
+                <span class="mc-text">
+                  <span class="mc-title">Tambah Transaksi</span>
+                  <span class="mc-sub">Catat DP, pelunasan, bayar produsen, dll</span>
+                </span>
+                <span class="arrow">›</span>
+              </button>
+              <button class="menu-card" data-target="kas-list" data-title="Riwayat Kas" data-sub="Saldo berjalan">
+                <span class="mc-icon">📒</span>
+                <span class="mc-text">
+                  <span class="mc-title">Riwayat Transaksi (Saldo Berjalan)</span>
+                  <span class="mc-sub">Semua transaksi kas beserta saldonya</span>
+                </span>
+                <span class="arrow">›</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="menu-page" id="page-kas-form" hidden>
+            <button class="back-btn" data-back>Kembali ke Menu</button>
+            <h2 class="section-title">Tambah Transaksi Kas</h2>
+            <p class="section-sub">Catat setiap uang masuk atau keluar.</p>
+            <div class="panel" style="max-width:640px;">
+              <input type="hidden" id="k-id">
+              <div class="grid-form">
+                <div class="field"><label>Tanggal</label><input type="date" id="k-tanggal"></div>
+                <div class="field"><label>Jenis</label><select id="k-jenis"><option>Masuk</option><option>Keluar</option></select></div>
+                <div class="field" style="grid-column:1/-1;"><label>Proyek Terkait</label><select id="k-proyek"><option value="">(Umum / Tidak terkait proyek)</option></select></div>
+                <div class="field" style="grid-column:1/-1;"><label>Kategori</label>
+                  <select id="k-kategori">
+                    <option>DP Konsumen</option><option>Pelunasan Konsumen</option><option>Bayar ke Produsen</option>
+                    <option>Ongkos Kirim</option><option>Biaya Operasional</option><option>Lainnya</option>
+                  </select>
                 </div>
-                <div class="actions-row">
-                  <button class="btn primary" id="k-save">Simpan Transaksi</button>
-                  <button class="btn ghost" id="k-cancel" style="display:none;">Batal Edit</button>
-                </div>
+                <div class="field" style="grid-column:1/-1;"><label>Jumlah (Rp)</label><input type="number" id="k-jumlah" placeholder="500000"></div>
+                <div class="field" style="grid-column:1/-1;"><label>Keterangan</label><input type="text" id="k-keterangan" placeholder="cth. DP 50% dari Bu Sari"></div>
+              </div>
+              <div class="actions-row">
+                <button class="btn primary" id="k-save">Simpan Transaksi</button>
+                <button class="btn ghost" id="k-cancel" style="display:none;">Batal Edit</button>
               </div>
             </div>
-            <div class="work-main">
-              <div class="panel">
-                <h3>Riwayat Transaksi (Saldo Berjalan)</h3>
-                <div class="table-wrap"><table>
-                  <thead><tr><th>Tgl</th><th>Proyek</th><th>Jenis</th><th>Kategori</th><th>Keterangan</th><th>Jumlah</th><th>Saldo</th><th>Aksi</th></tr></thead>
-                  <tbody id="kas-body"></tbody>
-                </table></div>
-              </div>
+          </div>
+
+          <div class="menu-page" id="page-kas-list" hidden>
+            <button class="back-btn" data-back>Kembali ke Menu</button>
+            <h2 class="section-title">Riwayat Transaksi (Saldo Berjalan)</h2>
+            <p class="section-sub">Semua transaksi kas yang tercatat, urut sesuai tanggal.</p>
+            <div class="panel">
+              <div class="table-wrap"><table>
+                <thead><tr><th>Tgl</th><th>Proyek</th><th>Jenis</th><th>Kategori</th><th>Keterangan</th><th>Jumlah</th><th>Saldo</th><th>Aksi</th></tr></thead>
+                <tbody id="kas-body"></tbody>
+              </table></div>
             </div>
           </div>
         </section>
 
-        <!-- PENGATURAN -->
+        <!-- ==================== PENGATURAN (langsung) ==================== -->
         <section id="view-pengaturan" class="view">
           <h2 class="section-title">Pengaturan Koneksi Google Sheets</h2>
           <p class="section-sub">Tempel URL Web App dari Google Apps Script di sini.</p>
@@ -508,9 +613,8 @@
 <script>
 /* ===========================================================
    PENGATURAN CEPAT
-   -----------------------------------------------------------
-   SKIP_LOGIN = true  -> password dimatikan (untuk preview)
-   SKIP_LOGIN = false -> password aktif (untuk dipakai di GitHub)
+   SKIP_LOGIN = true  -> password dimatikan (preview)
+   SKIP_LOGIN = false -> password aktif (GitHub)
 =========================================================== */
 const SKIP_LOGIN = true;
 const APP_PASSWORD = 'isakuiki2026';
@@ -522,9 +626,9 @@ let transaksiData = [], itemData = [], timelineData = [], kasData = [];
 
 const PAGE_META = {
   dashboard:  { title:'Dashboard',         sub:'Ringkasan usaha & aktivitas' },
-  proyek:     { title:'Data Proyek',       sub:'Transaksi & item barang per proyek' },
-  timeline:   { title:'Timeline Progres',  sub:'Pantau tahap produksi' },
-  kas:        { title:'Buku Kas',          sub:'Catat uang masuk & keluar' },
+  proyek:     { title:'Proyek & Item',     sub:'Pilih menu di bawah' },
+  timeline:   { title:'Timeline Progres',  sub:'Pilih menu di bawah' },
+  kas:        { title:'Buku Kas',          sub:'Pilih menu di bawah' },
   pengaturan: { title:'Pengaturan',        sub:'Koneksi ke Google Sheets' }
 };
 
@@ -656,6 +760,32 @@ async function withBusy(btn, fn){
   finally{ btn.disabled = false; btn.textContent = orig; }
 }
 
+/* =====================================================
+   NAVIGASI DUA TINGKAT (menu utama -> sub-menu -> konten)
+===================================================== */
+
+/* Tampilkan landing (daftar teks) di dalam view */
+function showLanding(viewEl){
+  const landing = viewEl.querySelector('.menu-landing');
+  if(!landing) return;
+  landing.hidden = false;
+  viewEl.querySelectorAll('.menu-page').forEach(p=>p.hidden = true);
+}
+
+/* Tampilkan halaman tertentu di dalam view */
+function showPage(viewId, pageId, customTitle, customSub){
+  const viewEl = document.getElementById(viewId);
+  if(!viewEl) return;
+  const landing = viewEl.querySelector('.menu-landing');
+  if(landing) landing.hidden = true;
+  viewEl.querySelectorAll('.menu-page').forEach(p=>p.hidden = true);
+  const page = viewEl.querySelector('#page-'+pageId);
+  if(page) page.hidden = false;
+
+  if(customTitle) document.getElementById('page-title').textContent = customTitle;
+  if(customSub)   document.getElementById('page-sub').textContent   = customSub;
+}
+
 /* ---------- SIDEBAR TAB SWITCH ---------- */
 document.querySelectorAll('.side-menu button').forEach(btn=>{
   btn.addEventListener('click', ()=>{
@@ -663,8 +793,13 @@ document.querySelectorAll('.side-menu button').forEach(btn=>{
     document.querySelectorAll('.side-menu button').forEach(b=>b.classList.remove('active'));
     document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
     btn.classList.add('active');
-    document.getElementById('view-'+tab).classList.add('active');
+    const view = document.getElementById('view-'+tab);
+    view.classList.add('active');
 
+    // Reset ke landing kalau ada
+    showLanding(view);
+
+    // Update topbar
     const meta = PAGE_META[tab] || { title:'', sub:'' };
     document.getElementById('page-title').textContent = meta.title;
     document.getElementById('page-sub').textContent = meta.sub;
@@ -675,18 +810,32 @@ document.querySelectorAll('.side-menu button').forEach(btn=>{
   });
 });
 
-/* ---------- SUB TABS (dalam halaman Proyek) ---------- */
-document.querySelectorAll('.subtabs button').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    const sub = btn.dataset.subtab;
-    const parent = btn.closest('.view');
-    parent.querySelectorAll('.subtabs button').forEach(b=>b.classList.remove('active'));
-    parent.querySelectorAll('.subpane').forEach(p=>p.classList.remove('active'));
-    btn.classList.add('active');
-    parent.querySelector('#subpane-'+sub).classList.add('active');
+/* ---------- KLIK MENU CARD (sub-menu) ---------- */
+document.querySelectorAll('.menu-card').forEach(card=>{
+  card.addEventListener('click', ()=>{
+    const view = card.closest('.view');
+    const target = card.dataset.target;
+    const title = card.dataset.title || '';
+    const sub = card.dataset.sub || '';
+    showPage(view.id, target, title, sub);
+    window.scrollTo({top:0, behavior:'smooth'});
   });
 });
 
+/* ---------- TOMBOL KEMBALI ---------- */
+document.querySelectorAll('.back-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const view = btn.closest('.view');
+    const tab = view.id.replace('view-','');
+    const meta = PAGE_META[tab] || { title:'', sub:'' };
+    document.getElementById('page-title').textContent = meta.title;
+    document.getElementById('page-sub').textContent = meta.sub;
+    showLanding(view);
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+});
+
+/* ---------- SELECT PROYEK ---------- */
 function populateProjectSelects(){
   const opts = transaksiData.map(t=>`<option value="${t.ID}">${transLabel(t)}</option>`).join('');
   const itemSel = document.getElementById('item-trx');
@@ -753,7 +902,8 @@ function editTrx(id){
   document.getElementById('trx-foto').value=t.Foto||'';
   document.getElementById('trx-form-title').textContent='Edit Transaksi';
   document.getElementById('trx-cancel').style.display='inline-block';
-  if(window.innerWidth <= 1100) window.scrollTo({top:0,behavior:'smooth'});
+  showPage('view-proyek','proyek-input','Edit Transaksi','Ubah data transaksi lalu simpan');
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 function deleteTrx(id){
   if(!confirm('Hapus transaksi ini di Google Sheets? Item barang di dalamnya tidak otomatis terhapus.')) return;
@@ -762,6 +912,7 @@ function deleteTrx(id){
 
 function renderTransaksi(){
   const body = document.getElementById('trx-body');
+  if(!body) return;
   if(transaksiData.length===0){ body.innerHTML = `<tr><td colspan="10" class="empty">Belum ada transaksi/proyek.</td></tr>`; return; }
   body.innerHTML = transaksiData.map(t=>{
     const agg = transaksiTotals(t.ID);
@@ -825,7 +976,8 @@ function editItem(id){
   document.getElementById('item-jual').value=i.Jual||'';
   document.getElementById('item-form-title').textContent='Edit Item Barang';
   document.getElementById('item-cancel').style.display='inline-block';
-  if(window.innerWidth <= 1100) window.scrollTo({top:0,behavior:'smooth'});
+  showPage('view-proyek','proyek-input','Edit Item Barang','Ubah data item lalu simpan');
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 function deleteItem(id){
   if(!confirm('Hapus item barang ini di Google Sheets?')) return;
@@ -834,6 +986,7 @@ function deleteItem(id){
 
 function renderItem(){
   const body = document.getElementById('item-body');
+  if(!body) return;
   if(itemData.length===0){ body.innerHTML = `<tr><td colspan="7" class="empty">Belum ada item barang.</td></tr>`; return; }
   body.innerHTML = itemData.map(i=>{
     const t = transaksiData.find(x=>x.ID===i.TransaksiID);
@@ -884,12 +1037,13 @@ function renderTrack(){
   const projId = document.getElementById('t-proyek-select').value;
   const track = document.getElementById('t-track');
   const emptyMsg = document.getElementById('t-track-empty');
+  if(!track) return;
   if(!projId){
     track.innerHTML = '';
-    emptyMsg.style.display = 'block';
+    if(emptyMsg) emptyMsg.style.display = 'block';
     return;
   }
-  emptyMsg.style.display = 'none';
+  if(emptyMsg) emptyMsg.style.display = 'none';
   const steps = timelineData.filter(t=>t.ProjekID===projId);
   track.innerHTML = TAHAP_ORDER.map(name=>{
     const s = steps.find(x=>x.Tahap===name);
@@ -910,7 +1064,8 @@ function editTimeline(id){
   document.getElementById('t-catatan').value=t.Catatan||'';
   document.getElementById('t-form-title').textContent='Edit Tahap';
   document.getElementById('t-cancel').style.display='inline-block';
-  if(window.innerWidth <= 1100) window.scrollTo({top:0,behavior:'smooth'});
+  showPage('view-timeline','timeline-form','Edit Tahap','Ubah data tahap lalu simpan');
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 function deleteTimeline(id){
   if(!confirm('Hapus tahap ini di Google Sheets?')) return;
@@ -919,6 +1074,7 @@ function deleteTimeline(id){
 
 function renderTimeline(){
   const body = document.getElementById('timeline-body');
+  if(!body) return;
   if(timelineData.length===0){ body.innerHTML = `<tr><td colspan="7" class="empty">Belum ada data timeline.</td></tr>`; return; }
   body.innerHTML = timelineData.map(t=>{
     const p = transaksiData.find(x=>x.ID===t.ProjekID);
@@ -973,7 +1129,8 @@ function editKas(id){
   document.getElementById('k-keterangan').value=k.Keterangan||'';
   document.getElementById('k-form-title').textContent='Edit Transaksi';
   document.getElementById('k-cancel').style.display='inline-block';
-  if(window.innerWidth <= 1100) window.scrollTo({top:0,behavior:'smooth'});
+  showPage('view-kas','kas-form','Edit Transaksi Kas','Ubah data lalu simpan');
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 function deleteKas(id){
   if(!confirm('Hapus transaksi ini di Google Sheets?')) return;
@@ -982,6 +1139,7 @@ function deleteKas(id){
 
 function renderKas(){
   const body = document.getElementById('kas-body');
+  if(!body) return;
   if(kasData.length===0){ body.innerHTML = `<tr><td colspan="8" class="empty">Belum ada transaksi kas.</td></tr>`; return; }
   const sorted = [...kasData].sort((a,b)=> String(a.Tanggal||'').localeCompare(String(b.Tanggal||'')));
   let saldo = 0;
